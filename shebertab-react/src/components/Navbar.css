@@ -1,0 +1,205 @@
+/* ====================================================
+   FEZ-inspired Navbar — adapted for SheberTab
+   ==================================================== */
+.fez-header {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 1200px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(8, 145, 178, 0.12);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-shadow: 0 8px 32px rgba(8, 145, 178, 0.12), 0 2px 8px rgba(0,0,0,0.06);
+  backdrop-filter: blur(16px);
+  z-index: 9999;
+  transition: background 0.4s, box-shadow 0.4s, border-color 0.4s;
+}
+
+.dark-theme .fez-header {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(34, 211, 238, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Brand */
+.fez-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.fez-logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #0891B2, #06b6d4);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 14px rgba(8, 145, 178, 0.3);
+}
+
+.fez-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.fez-logo-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+}
+
+.dark-theme .fez-logo-name {
+  color: #f8fafc;
+}
+
+.fez-logo-name span {
+  color: #F97316;
+}
+
+.fez-logo-sub {
+  font-size: 0.58rem;
+  color: #64748b;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Nav List */
+.fez-nav-list {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.fez-nav-item {
+  position: relative;
+}
+
+/* Nav Link — FEZ expanding style */
+.fez-nav-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #64748b;
+  background: rgba(8, 145, 178, 0.04);
+  height: 42px;
+  min-width: 42px;
+  padding: 0 10px;
+  border-radius: 22px;
+  border: 1px solid transparent;
+  overflow: hidden;
+  transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  white-space: nowrap;
+}
+
+.dark-theme .fez-nav-link {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.fez-icon {
+  min-width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fez-label {
+  max-width: 0;
+  opacity: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding-left: 0;
+  transition: max-width 0.5s ease, opacity 0.4s ease, padding-left 0.4s ease;
+  overflow: hidden;
+}
+
+/* Hover: expand */
+.fez-nav-link:hover {
+  min-width: 120px;
+  background: linear-gradient(135deg, #0891B2, #06b6d4);
+  color: #fff;
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 4px 20px rgba(8, 145, 178, 0.4);
+}
+
+.fez-nav-link:hover .fez-label {
+  max-width: 140px;
+  opacity: 1;
+  padding-left: 8px;
+}
+
+/* Active state */
+.fez-nav-active {
+  background: linear-gradient(135deg, #0891B2, #06b6d4) !important;
+  color: #fff !important;
+  min-width: 120px;
+  border-color: rgba(255,255,255,0.2) !important;
+  box-shadow: 0 4px 16px rgba(8, 145, 178, 0.35) !important;
+}
+
+.fez-nav-active .fez-label {
+  max-width: 140px !important;
+  opacity: 1 !important;
+  padding-left: 8px !important;
+}
+
+/* CTA Button */
+.fez-cta-link {
+  background: linear-gradient(135deg, #0891B2, #F97316) !important;
+  color: white !important;
+  min-width: 140px;
+  border-color: transparent !important;
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+}
+
+.fez-cta-label {
+  max-width: 140px !important;
+  opacity: 1 !important;
+  padding-left: 8px !important;
+}
+
+.fez-cta-link:hover {
+  background: linear-gradient(135deg, #0e7490, #ea580c) !important;
+  box-shadow: 0 6px 24px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* Dark Mode Toggle wrapper in nav */
+.fez-toggle-item {
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .fez-header {
+    padding: 0 12px;
+    top: 10px;
+    width: 98%;
+  }
+  .fez-logo-name, .fez-logo-sub { display: none; }
+  .fez-label { display: none !important; }
+  .fez-nav-link:hover { min-width: 42px; }
+  .fez-nav-active { min-width: 42px; }
+  .fez-cta-link { min-width: 42px; }
+  .fez-nav-list { gap: 4px; }
+}
