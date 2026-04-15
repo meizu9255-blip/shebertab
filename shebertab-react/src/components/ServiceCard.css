@@ -1,0 +1,91 @@
+.service-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, #0891B2, #22d3ee);
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(8, 145, 178, 0.15);
+}
+
+.service-img {
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+  background-color: #f1f5f9;
+}
+
+.service-content {
+  padding: 20px;
+}
+
+.service-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.25rem;
+  color: #1e293b;
+}
+
+.service-type {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 5px 0;
+  font-weight: 500;
+}
+
+.service-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0891B2;
+  margin: 10px 0;
+}
+
+.service-phone {
+  font-size: 0.9rem;
+  color: #475569;
+  margin: 5px 0 15px 0;
+}
+
+.service-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit, .btn-delete {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 1;
+  transition: background 0.2s;
+}
+
+.btn-edit {
+  background: #f1f5f9;
+  color: #0891B2;
+}
+
+.btn-edit:hover {
+  background: #e2e8f0;
+}
+
+.btn-delete {
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.btn-delete:hover {
+  background: #ffe4e6;
+}
