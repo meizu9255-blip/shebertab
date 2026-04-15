@@ -854,3 +854,5 @@ footer .footer-links a:hover { color: var(--accent); }
   .lamp-side { min-height: 280px; border-right: none; border-bottom: 1px solid var(--border); }
   .stat-item { padding: 18px 16px; }
 }
+.nav-react-badge { background: #e0f2fe !important; color: #0284c7 !important; border: 1px solid #7dd3fc; }
+.nav-react-badge:hover { background: #0284c7 !important; color: white !important; }
