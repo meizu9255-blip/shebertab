@@ -1,0 +1,6 @@
+# Git ignore
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.vscode/settings.json

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ШеберТаб — Блог</title>
+  <meta name="description" content="Пайдалы кеңестер мен мақалалар — ШеберТаб блогы">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo-wrap">
+      <div class="logo-icon">🔧</div>
+      <div class="logo-text-group">
+        <span class="logo-name">Sheber<span class="accent">Tab</span></span>
+        <span class="logo-sub">Masters Platform</span>
+      </div>
+    </a>
+    <nav>
+      <a href="index.html">Басты</a>
+      <a href="about.html">Туралы</a>
+      <a href="services.html">Қызметтер</a>
+      <a href="blog.html" class="active">Блог</a>
+      <a href="contact.html">Байланыс</a>
+      <a href="practical2.html">JS Практика</a>
+      <a href="register.html" class="nav-cta">Тіркелу</a>
+      <a href="login.html">Кіру</a>
+    </nav>
+  </header>
+
+  <section class="page-hero">
+    <div class="badge">📝 Пайдалы мақалалар</div>
+    <h1>Блог және <span class="grad">кеңестер</span></h1>
+    <p>Тұрмыстық жөндеу, маман таңдау және платформа туралы пайдалы материалдар</p>
+  </section>
+
+  <div class="container">
+    <div class="blog-grid fade-up">
+
+      <article class="blog-card">
+        <div class="blog-card-img">🔐</div>
+        <div class="blog-card-body">
+          <p class="blog-cat">Кеңес</p>
+          <h3>Сенімді шеберді қалай таңдаймыз?</h3>
+          <p>Маманның рейтингі мен бұрынғы клиенттердің пікірлерін оқудың маңыздылығы өте зор...</p>
+          <a href="#" class="read-more" onclick="blogAlert(event)">Толығырақ оқу →</a>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <div class="blog-card-img">⚡</div>
+        <div class="blog-card-body">
+          <p class="blog-cat">Қауіпсіздік</p>
+          <h3>Электр тогымен абай болыңыз!</h3>
+          <p>Үйдегі розеткадан ұшқын шыққан жағдайдағы алғашқы қауіпсіздік шаралары...</p>
+          <a href="#" class="read-more" onclick="blogAlert(event)">Толығырақ оқу →</a>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <div class="blog-card-img">💼</div>
+        <div class="blog-card-body">
+          <p class="blog-cat">Шеберлерге</p>
+          <h3>Фрилансер-мамандарға кеңес</h3>
+          <p>Платформада профиліңізді дұрыс толтырып, көп тапсырыс алу жолдары...</p>
+          <a href="#" class="read-more" onclick="blogAlert(event)">Толығырақ оқу →</a>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <div class="blog-card-img">🔧</div>
+        <div class="blog-card-body">
+          <p class="blog-cat">Жөндеу</p>
+          <h3>Краны өзіңіз жөндей аласыз ба?</h3>
+          <p>Қарапайым сантехникалық жұмыстарды өзіңіз жасаудың мүмкін болатын тәсілдері...</p>
+          <a href="#" class="read-more" onclick="blogAlert(event)">Толығырақ оқу →</a>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <div class="blog-card-img">🏠</div>
+        <div class="blog-card-body">
+          <p class="blog-cat">Үй дизайны</p>
+          <h3>2026 жылғы үй жөндеу трендтері</h3>
+          <p>Биыл қандай материалдар мен стильдер сұранысқа ие болып жатыр — шолу...</p>
+          <a href="#" class="read-more" onclick="blogAlert(event)">Толығырақ оқу →</a>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <div class="blog-card-img">📱</div>
+        <div class="blog-card-body">
+          <p class="blog-cat">Технология</p>
+          <h3>ШеберТаб қосымшасы жаңартылды</h3>
+          <p>Жаңа мүмкіндіктер: жедел чат, онлайн төлем, маман GPS картасы...</p>
+          <a href="#" class="read-more" onclick="blogAlert(event)">Толығырақ оқу →</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <footer>
+    <p>Автор: Әлімбек Бексұлтан | &copy; 2026 ШеберТаб</p>
+    <div class="footer-links">
+      <a href="#">Instagram</a>
+      <a href="#">Telegram</a>
+      <a href="#">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    function blogAlert(e) {
+      e.preventDefault();
+      alert('📖 Бұл мақаланың толық нұсқасы жақында жарияланады! Бізбен бірге болыңыз.');
+    }
+  </script>
+</body>
+</html>
