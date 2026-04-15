@@ -5,7 +5,7 @@
     "service": "Сантехник қызметі",
     "price": "5000 ₸",
     "phone": "+7 701 123 45 67",
-    "image": "https://randomuser.me/api/portraits/men/32.jpg"
+    "image": "/images/askar.jpg"
   },
   {
     "id": 2,
@@ -13,7 +13,7 @@
     "service": "Электрик қызметі",
     "price": "4500 ₸",
     "phone": "+7 702 987 65 43",
-    "image": "https://randomuser.me/api/portraits/men/45.jpg"
+    "image": "/images/dauren.jpg"
   },
   {
     "id": 3,
@@ -21,7 +21,7 @@
     "service": "Жиһаз құрастыру",
     "price": "8000 ₸",
     "phone": "+7 705 111 22 33",
-    "image": "https://randomuser.me/api/portraits/men/67.jpg"
+    "image": "/images/nurlan.jpg"
   },
   {
     "id": 4,
@@ -29,7 +29,7 @@
     "service": "Тазалық қызметі",
     "price": "3000 ₸",
     "phone": "+7 777 444 55 66",
-    "image": "https://randomuser.me/api/portraits/women/44.jpg"
+    "image": "/images/aigul.jpg"
   },
   {
     "id": 5,
@@ -37,7 +37,7 @@
     "service": "Ұзата жөндеу",
     "price": "6000 ₸",
     "phone": "+7 707 555 33 11",
-    "image": "https://randomuser.me/api/portraits/men/22.jpg"
+    "image": "/images/ermek.jpg"
   },
   {
     "id": 6,
@@ -45,6 +45,6 @@
     "service": "Тазалық қызметі",
     "price": "2500 ₸",
     "phone": "+7 708 222 77 88",
-    "image": "https://randomuser.me/api/portraits/women/28.jpg"
+    "image": "/images/samal.jpg"
   }
 ]
