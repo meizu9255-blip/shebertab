@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 
 const Auth = () => {
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('currentUser')); } catch { return null; }
+  });
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotMode, setIsForgotMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -31,11 +34,19 @@ const Auth = () => {
       return;
     }
     
-    // Сәтті кіру
-    showMessage('Жүйеге сәтті кірдіңіз!', 'success');
-    setTimeout(() => {
-      navigate('/');
-    }, 1000);
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const found = users.find(u => u.email === email && u.password === password);
+
+    if (found) {
+      localStorage.setItem('currentUser', JSON.stringify({ name: found.name, email: found.email }));
+      setUser({ name: found.name, email: found.email });
+      showMessage('Жүйеге сәтті кірдіңіз!', 'success');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+    } else {
+      showMessage('Қате: Email немесе пароль қате!', 'error');
+    }
   };
 
   const handleRegisterSubmit = (e) => {
@@ -67,10 +78,23 @@ const Auth = () => {
       return;
     }
 
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    if (users.find(u => u.email === email)) {
+      showMessage('Қате: Бұл email тіркелген!', 'error');
+      return;
+    }
+
+    users.push({ name, email, password });
+    localStorage.setItem('users', JSON.stringify(users));
+
     // Сәтті тіркелу
-    showMessage('Аккаунт жасалды! Енді жүйеге кіріңіз.', 'success');
+    localStorage.setItem('currentUser', JSON.stringify({ name, email }));
+    setUser({ name, email });
+    showMessage('Аккаунт жасалды! Жүйеге кіріп жатырсыз...', 'success');
     e.target.reset();
-    setIsSignUp(false);
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
   };
 
   const handleForgotSubmit = (e) => {
@@ -90,6 +114,21 @@ const Auth = () => {
   const handleSocialAlert = (provider) => {
     showMessage(`${provider} арқылы кіру жақында қосылады!`, 'success');
   };
+
+  if (user) {
+    return (
+      <div className="auth-wrapper">
+        <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto', background: 'var(--surface)', padding: '40px', borderRadius: '10px', textAlign: 'center', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '10px' }}>👤</div>
+          <h2 style={{ color: 'var(--text)' }}>Сәлем, <span style={{ color: 'var(--primary)' }}>{user.name}</span>!</h2>
+          <p style={{ color: 'var(--muted)', marginBottom: '30px', marginTop: '10px' }}>Жүйеге сәтті кірдіңіз ({user.email})</p>
+          <button onClick={() => { localStorage.removeItem('currentUser'); setUser(null); window.location.href = '/'; }} className="btn btn-outline" style={{ borderColor: 'var(--red)', color: 'var(--red)', width: '100%', justifyContent: 'center' }}>
+            🚪 Жүйеден шығу
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-wrapper">

@@ -7,7 +7,7 @@ const CATEGORIES = [
   'Электрик қызметі',
   'Жиһаз құрастыру',
   'Тазалық қызметі',
-  'Ұзата жөндеу',
+  'Күрделі жөндеу',
 ];
 
 function FilterHeader({ searchTerm, onSearchChange, filterCategory, onFilterChange }) {

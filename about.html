@@ -1,117 +1,161 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="kk">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SheberTab - Biz turaly</title>
-  <meta name="description" content="SheberTab platformasy turaly - missiya, komanda, qundylyqtar">
+  <title>ШеберТаб — Біз туралы</title>
+  <meta name="description" content="SheberTab платформасы туралы — миссия, команда, құндылықтар">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-  <header>
-    <a href="index.html" class="logo-wrap">
-      <div class="logo-icon">&#128295;</div>
-      <div class="logo-text-group">
-        <span class="logo-name">Sheber<span class="accent">Tab</span></span>
-        <span class="logo-sub">Masters Platform</span>
+  
+  <header class="fez-header">
+    <a href="index.html" class="fez-brand">
+      <div class="fez-logo-icon">🔧</div>
+      <div class="fez-logo-text">
+        <span class="fez-logo-name">Sheber<span>Tab</span></span>
+        <span class="fez-logo-sub">Masters Platform</span>
       </div>
     </a>
+
     <nav>
-      <a href="index.html">Basty</a>
-      <a href="about.html" class="active">Turaly</a>
-      <a href="services.html">Kyzmetter</a>
-      <a href="blog.html">Blog</a>
-      <a href="contact.html">Bailanys</a>
-      <a href="practical2.html">JS Zertkhana</a>
-      <a href="http://localhost:5173/" target="_blank" class="nav-react-badge">React CRUD</a>
-      <a href="register.html" class="nav-cta">Tirkelu</a>
-      <a href="login.html">Kiru</a>
+      <ul class="fez-nav-list">
+        <li class="fez-nav-item">
+          <a href="index.html" class="fez-nav-link ">
+            <span class="fez-icon"><svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/></svg></span>
+            <span class="fez-label">Басты</span>
+          </a>
+        </li>
+        <li class="fez-nav-item">
+          <a href="about.html" class="fez-nav-link fez-nav-active">
+            <span class="fez-icon"><svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg></span>
+            <span class="fez-label">Туралы</span>
+          </a>
+        </li>
+        <li class="fez-nav-item">
+          <a href="services.html" class="fez-nav-link ">
+            <span class="fez-icon"><svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor"><path d="m706-136-75-75 51-51-106-106-51 51-75-75 51-51-85-85-51 51-75-75 199-199q14-14 34-14t34 14l75 75 50-51q12-12 28.5-12t28.5 12l93 93q12 12 12 28.5T838-633l-51 50 75 75q14 14 14 34t-14 34L706-136Zm-20-212 56-56-169-169-56 56 169 169ZM314-240q-45 0-82-27t-51-71L80-680l84 84q17 17 17 42t-17 42q-17 17-42 17t-42-17L0-592l83 83q15 15 21 33t6 37l90 90q14 14 14 34t-14 34l-75 75-75-75q-14-14-14-34t14-34l-41-39q-20-20-20-48t20-47l-95-95 152 152q17 17 42 17t42-17q17-17 17-42t-17-42L80-800l192 192q13 13 20.5 29t9.5 34l22 22q0-17 6-33t18-28l159-159q21-21 50-21t50 21l75 75q21 21 21 50t-21 50L763-440q12 14 18 30.5t6 34.5v21l-21-21q-12-12-12-28.5T766-432L634-564q-13-13-31-13t-31 13l-35 35 88 88q17 17 17 41.5T625-357q-17 17-41.5 17T542-357L406-493q-10 10-10 24t10 24l150 150q24 24 26 58t-22 58l-75 75q-14 14-34 14t-34-14l-103-103q-14-14-14-34t14-34l75-75Z"/></svg></span>
+            <span class="fez-label">Қызметтер</span>
+          </a>
+        </li>
+        <li class="fez-nav-item">
+          <a href="blog.html" class="fez-nav-link ">
+            <span class="fez-icon"><svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor"><path d="M160-400v-80h280v80H160Zm0-160v-80h440v80H160Zm0-160v-80h440v80H160Zm360 560v-123l221-221q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T863-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/></svg></span>
+            <span class="fez-label">Блог</span>
+          </a>
+        </li>
+        <li class="fez-nav-item">
+          <a href="contact.html" class="fez-nav-link ">
+            <span class="fez-icon"><svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/></svg></span>
+            <span class="fez-label">Байланыс</span>
+          </a>
+        </li>
+        <li class="fez-nav-item fez-toggle-item">
+          <button class="dark-mode-toggle" id="theme-toggle" aria-label="Түнгі режим">
+            <span class="toggle-track"><span class="toggle-thumb"><span class="sun-icon">☀️</span><span class="moon-icon">🌙</span></span></span>
+            <span class="toggle-label mode-text">Жарық</span>
+          </button>
+        </li>
+        <li class="fez-nav-item">
+          <a href="login.html" class="fez-nav-link fez-cta-link ">
+            <span class="fez-icon"><svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor"><path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"/></svg></span>
+            <span class="fez-label fez-cta-label">Кіру / Тіркелу</span>
+          </a>
+        </li>
+      </ul>
     </nav>
   </header>
 
-  <section class="page-hero">
-    <div class="badge">Platforma turaly</div>
-    <h1>Biz <span class="grad">turaly</span></h1>
-    <p>SheberTab - tapsyrys berushiler men kasibi sheberlerdi bailanystyratyn senimdi platforma</p>
+  <div style="padding-top: 90px;">
+<section class="page-hero">
+    <div class="badge">Платформа туралы</div>
+    <h1>Біз <span class="grad">туралы</span></h1>
+    <p>ШеберТаб — тапсырыс берушілер мен кәсіби шеберлерді байланыстыратын сенімді платформа</p>
   </section>
 
   <div class="container">
 
     <div class="about-split fade-up">
       <div>
-        <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=700&q=80"
-             alt="Sheber zhumys istep jatyr" class="about-img">
+        <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=700&q=80" alt="Шебер жұмыс істеп жатыр"
+          class="about-img">
       </div>
       <div class="about-text">
-        <h2>Bizdin missiyamyz</h2>
-        <p>Bul platforma tutynushylarmen zhergilikti kyzmet korsetushi mamandardy qauipsiz, tez ari yngaily turde bailanystyru ushin quryldy.</p>
-        <p>Bizdin basty maksatymyz - sizdin uakytynyzdy unemdeu jane turmystyq akaulardy senimdi mamanga tiimdi bagamen zhondetuge komektesu.</p>
-        <p>2024 jyldan bastap zhumys isteimiz. Buginde 500+ tekserilgen mamanymyz bar.</p>
+        <h2>Біздің миссиямыз</h2>
+        <p>Бұл платформа тұтынушылармен жергілікті қызмет көрсететін мамандарды қауіпсіз, жылдам және ыңғайлы түрде
+          байланыстыру үшін құрылды.</p>
+        <p>Біздің басты мақсатымыз — сіздің уақытыңызды үнемдеу және тұрмыстық ақауларды сенімді маманға тиімді бағамен
+          жөндетуге көмектесу.</p>
+        <p>2024 жылдан бастап жұмыс істейміз. Бүгінде 500+ тексерілген маманымыз бар.</p>
+        
+        <div style="margin-top: 20px; padding: 15px; background: var(--surface2); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+          <div onclick="document.getElementById('faq-content').classList.toggle('hidden'); document.getElementById('faq-chevron').innerText = document.getElementById('faq-content').classList.contains('hidden') ? '▼' : '▲'" style="display: flex; justify-content: space-between; cursor: pointer; font-weight: bold; color: var(--accent);">
+            <span>Жиі қойылатын сұрақтар (FAQ)</span>
+            <span id="faq-chevron">▼</span>
+          </div>
+          <div id="faq-content" class="hidden" style="margin-top: 10px; font-size: 0.9rem; color: var(--muted); padding-top: 10px; border-top: 1px solid var(--border);">
+            <p><strong>С: Мамандар қалай тексеріледі?</strong></p>
+            <p>Ж: Барлық шеберлер базаға қосылмас бұрын жеке басын куәландыратын құжаттар және тест арқылы тексеріледі.</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="values-grid fade-up">
       <div class="value-card">
-        <div class="value-icon">&#128274;</div>
-        <h3>Senimdilik</h3>
-        <p>Barlyk sheberler tekserilgen, ratingtelgen jane verifikaciyalangan</p>
+        <div class="value-icon">🔐</div>
+        <h3>Сенімділік</h3>
+        <p>Барлық шеберлер тексерілген, рейтингтелген және верификацияланған</p>
       </div>
       <div class="value-card">
-        <div class="value-icon">&#9889;</div>
-        <h3>Jyldamdyq</h3>
-        <p>Tapsyrysty 15 minutta ornalastyryp, maman tauyp alasiz</p>
+        <div class="value-icon">⚡</div>
+        <h3>Жылдамдық</h3>
+        <p>Тапсырысты 15 минутта орналастырып, маман тауып аласыз</p>
       </div>
       <div class="value-card">
-        <div class="value-icon">&#128142;</div>
-        <h3>Sapa</h3>
-        <p>Zhumys sapasyna tolyk kepildik beriledi</p>
+        <div class="value-icon">💎</div>
+        <h3>Сапа</h3>
+        <p>Жұмыс сапасына толық кепілдік беріледі</p>
       </div>
       <div class="value-card">
-        <div class="value-icon">&#128184;</div>
-        <h3>Ashyk baga</h3>
-        <p>Zhasyryn tolemder zhok - bagany aldyn ala siz belgileisiz</p>
+        <div class="value-icon">💸</div>
+        <h3>Ашық баға</h3>
+        <p>Жасырын төлемдер жоқ — бағаны алдын-ала сіз белгілейсіз</p>
       </div>
     </div>
 
-    <h2 class="section-title" style="text-align:center">Komandamyz</h2>
-    <p class="section-sub" style="text-align:center">Platformany damytatyn adamdar</p>
+    <h2 class="section-title" style="text-align:center">Командамыз</h2>
+    <p class="section-sub" style="text-align:center">Платформаны дамытатын адамдар</p>
 
     <div class="team-grid fade-up">
       <div class="team-card">
-        <div class="team-avatar">
-          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=220&q=80&fit=crop" alt="Beksultan A.">
-        </div>
-        <h3>Beksultan A.</h3>
+        <div class="team-avatar">👨‍💻</div>
+        <h3>Бексұлтан Ә.</h3>
         <p>Full-stack Developer</p>
       </div>
       <div class="team-card">
-        <div class="team-avatar">
-          <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=220&q=80&fit=crop" alt="Askar M.">
-        </div>
-        <h3>Askar M.</h3>
-        <p>UI/UX Designer</p>
+        <div class="team-avatar">👨‍🎨</div>
+        <h3>Асқар М.</h3>
+        <p>UI/UX Дизайнері</p>
       </div>
       <div class="team-card">
-        <div class="team-avatar">
-          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=220&q=80&fit=crop" alt="Aigerim T.">
-        </div>
-        <h3>Aigerim T.</h3>
-        <p>Product Manager</p>
+        <div class="team-avatar">👩‍💼</div>
+        <h3>Айгерім Т.</h3>
+        <p>Өнім менеджері</p>
       </div>
       <div class="team-card">
-        <div class="team-avatar">
-          <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=220&q=80&fit=crop" alt="Dauren K.">
-        </div>
-        <h3>Dauren K.</h3>
-        <p>Operations Lead</p>
+        <div class="team-avatar">👨‍🔧</div>
+        <h3>Дәурен Қ.</h3>
+        <p>Операциялар жетекшісі</p>
       </div>
     </div>
-
-  </div>
+</div>
 
   <footer>
-    <p>Avtor: Alimbek Beksultan | &copy; 2026 SheberTab</p>
+    <p>Автор: Әлімбек Бексұлтан | &copy; 2026 ШеберТаб</p>
     <div class="footer-links">
       <a href="#">Instagram</a>
       <a href="#">Telegram</a>
@@ -119,5 +163,7 @@
     </div>
   </footer>
 
+  <script src="js/auth-state.js"></script>
 </body>
+
 </html>

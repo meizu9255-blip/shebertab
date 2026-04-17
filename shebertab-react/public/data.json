@@ -5,7 +5,7 @@
     "service": "Сантехник қызметі",
     "price": "5000 ₸",
     "phone": "+7 701 123 45 67",
-    "image": "/images/askar.jpg"
+    "image": "https://i.pinimg.com/736x/1e/33/3d/1e333d1dc2fb63365f2d48dc5dcf36c0.jpg"
   },
   {
     "id": 2,
@@ -13,7 +13,7 @@
     "service": "Электрик қызметі",
     "price": "4500 ₸",
     "phone": "+7 702 987 65 43",
-    "image": "/images/dauren.jpg"
+    "image": "https://i.pinimg.com/1200x/19/cf/e5/19cfe5855816592b5d420e9e19396753.jpg"
   },
   {
     "id": 3,
@@ -21,7 +21,7 @@
     "service": "Жиһаз құрастыру",
     "price": "8000 ₸",
     "phone": "+7 705 111 22 33",
-    "image": "/images/nurlan.jpg"
+    "image": "https://i.pinimg.com/736x/2e/e9/50/2ee95040f79ca8074c95f77f1d6cdfac.jpg"
   },
   {
     "id": 4,
@@ -29,15 +29,15 @@
     "service": "Тазалық қызметі",
     "price": "3000 ₸",
     "phone": "+7 777 444 55 66",
-    "image": "/images/aigul.jpg"
+    "image": "https://i.pinimg.com/736x/b4/f1/93/b4f193ccaa0fe4cde6b796b796a73b90.jpg"
   },
   {
     "id": 5,
     "name": "Ермек Тоқтаров",
-    "service": "Ұзата жөндеу",
+    "service": "Күрделі жөндеу",
     "price": "6000 ₸",
     "phone": "+7 707 555 33 11",
-    "image": "/images/ermek.jpg"
+    "image": "https://i.pinimg.com/736x/6a/84/a2/6a84a2786761314d87f6d0ae11b01ed5.jpg"
   },
   {
     "id": 6,
@@ -45,6 +45,6 @@
     "service": "Тазалық қызметі",
     "price": "2500 ₸",
     "phone": "+7 708 222 77 88",
-    "image": "/images/samal.jpg"
+    "image": "https://i.pinimg.com/736x/66/c1/96/66c196d2702e763741ad28a433b7449f.jpg"
   }
 ]

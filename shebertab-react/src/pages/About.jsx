@@ -69,29 +69,14 @@ const About = () => {
           </div>
         </div>
 
-        <h2 className="section-title" style={{textAlign:'center'}}>Командамыз</h2>
-        <p className="section-sub" style={{textAlign:'center'}}>Платформаны дамытатын адамдар</p>
+        <h2 className="section-title" style={{textAlign:'center'}}>Жасаған</h2>
+        <p className="section-sub" style={{textAlign:'center'}}>Платформаны дамытқан адам</p>
 
         <div className="team-grid fade-up">
           <div className="team-card">
             <div className="team-avatar">👨‍💻</div>
             <h3>Beksultan A.</h3>
             <p>Full-stack Developer</p>
-          </div>
-          <div className="team-card">
-            <div className="team-avatar">👨‍🎨</div>
-            <h3>Askar M.</h3>
-            <p>UI/UX Designer</p>
-          </div>
-          <div className="team-card">
-            <div className="team-avatar">👩‍💼</div>
-            <h3>Aigerim T.</h3>
-            <p>Product Manager</p>
-          </div>
-          <div className="team-card">
-            <div className="team-avatar">👨‍🔧</div>
-            <h3>Dauren K.</h3>
-            <p>Operations Lead</p>
           </div>
         </div>
 
