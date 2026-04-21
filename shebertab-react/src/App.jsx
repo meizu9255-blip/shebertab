@@ -11,10 +11,15 @@ import AuthCallback from './pages/AuthCallback';
 import Profile from './pages/Profile';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
     <Routes>
+      {/* Dashboard - standalone without Layout */}
+      <Route path="/dashboard" element={<Dashboard />} />
+      
+      {/* Main site with Layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="about" element={<About />} />
