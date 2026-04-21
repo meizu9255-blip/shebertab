@@ -12,12 +12,16 @@ import Profile from './pages/Profile';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
+import LocalServices from './pages/LocalServices';
 
 function App() {
   return (
     <Routes>
       {/* Dashboard - standalone without Layout */}
       <Route path="/dashboard" element={<Dashboard />} />
+      
+      {/* Local Services Landing Page */}
+      <Route path="/local-services" element={<LocalServices />} />
       
       {/* Main site with Layout */}
       <Route path="/" element={<Layout />}>
