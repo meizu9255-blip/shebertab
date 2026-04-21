@@ -7,6 +7,9 @@ import ServicesPage from './pages/ServicesPage';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
+import AuthCallback from './pages/AuthCallback';
+import Profile from './pages/Profile';
+import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -19,6 +22,9 @@ function App() {
         <Route path="blog" element={<Blog />} />
         <Route path="contact" element={<Contact />} />
         <Route path="auth" element={<Auth />} />
+        <Route path="auth/callback" element={<AuthCallback />} />
+        <Route path="reset-password/:id/:token" element={<ResetPassword />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

@@ -3,11 +3,330 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SheberTab — Жеке кабинет</title>
+  <title>SheberTab — Кіру / Тіркелу</title>
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ═══════════════════════════════════════════════
+       Premium Auth Page — Vanilla Version
+    ═══════════════════════════════════════════════ */
+    .auth-bg {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 90px 20px 40px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0a0e1a 0%, #0c1824 40%, #0d1f2d 100%);
+    }
+    .auth-bg::before, .auth-bg::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      animation: orbf 9s ease-in-out infinite alternate;
+    }
+    .auth-bg::before {
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(8,145,178,0.2) 0%, transparent 70%);
+      top: -120px; left: -80px;
+    }
+    .auth-bg::after {
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(249,115,22,0.14) 0%, transparent 70%);
+      bottom: -80px; right: -60px;
+      animation-delay: -5s;
+    }
+    @keyframes orbf {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(35px,25px) scale(1.12); }
+    }
+
+    canvas#ptcl { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+
+    .auth-z { position:relative; z-index:10; width:100%; max-width:960px; }
+
+    /* Glass container */
+    .glass-box {
+      display: flex;
+      min-height: 580px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07);
+      transition: transform 0.3s;
+    }
+    .glass-box:hover { transform: translateY(-3px); }
+
+    /* Panels */
+    .p-login, .p-register {
+      flex: 1;
+      padding: 50px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: rgba(12,24,36,0.88);
+      backdrop-filter: blur(24px);
+      transition: opacity 0.4s;
+    }
+    .p-login { border-right: 1px solid rgba(255,255,255,0.06); }
+
+    /* Overlay slide */
+    .ovl-slide {
+      position: absolute;
+      top:0; left:0;
+      width:50%; height:100%;
+      z-index:100;
+      background: linear-gradient(145deg,#0891B2,#0d9fc5,#06b6d4,#F97316);
+      background-size: 200% 200%;
+      animation: gshift 7s ease infinite;
+      display: flex; align-items:center; justify-content:center;
+      box-shadow: 0 0 60px rgba(6,182,212,0.3);
+      transition: transform 0.65s cubic-bezier(0.68,-0.15,0.32,1.15);
+    }
+    .glass-box.reg-mode .ovl-slide { transform: translateX(100%); }
+    .glass-box.reg-mode .p-login   { opacity: 0; pointer-events: none; }
+    .glass-box:not(.reg-mode) .p-register { opacity: 0; pointer-events: none; }
+    @keyframes gshift {
+      0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+    }
+
+    .ovl-inner { text-align:center; padding:40px; color:#fff; }
+    .ovl-logo  { font-size:1.6rem; font-weight:900; margin-bottom:24px; }
+    .ovl-logo span { opacity:0.6; }
+    .ovl-inner h2 { font-size:1.9rem; font-weight:800; margin-bottom:14px; }
+    .ovl-inner p  { opacity:.85; font-size:0.93rem; line-height:1.7; margin-bottom:28px; }
+    .ovl-btn {
+      display:inline-block; padding:12px 36px;
+      border:2px solid rgba(255,255,255,0.85); border-radius:50px;
+      color:#fff; font-size:0.85rem; font-weight:700; letter-spacing:1.5px;
+      text-transform:uppercase; cursor:pointer; background:transparent;
+      font-family:'Poppins',sans-serif; transition:all 0.3s;
+    }
+    .ovl-btn:hover { background:rgba(255,255,255,0.2); transform:scale(1.04); }
+
+    /* Panel typography */
+    .pt { font-size:0.66rem; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:rgba(8,145,178,0.9); margin-bottom:8px; }
+    .ph { font-size:1.8rem; font-weight:800; color:#fff; margin-bottom:8px; line-height:1.2; }
+    .ps { font-size:0.83rem; color:rgba(255,255,255,0.45); margin-bottom:24px; line-height:1.5; }
+
+    /* Social */
+    .soc-row { display:flex; gap:10px; margin-bottom:22px; }
+    .soc-btn {
+      flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+      padding:11px 8px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.8);
+      font-size:0.78rem; font-weight:600; cursor:pointer;
+      font-family:'Poppins',sans-serif; transition:all 0.25s;
+      backdrop-filter:blur(8px);
+    }
+    .soc-btn:hover { transform:translateY(-2px); border-color:rgba(255,255,255,0.25); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+    .soc-btn:active { transform:scale(0.96); }
+    .soc-btn.google:hover { background:rgba(234,67,53,0.18); border-color:rgba(234,67,53,0.5); }
+    .soc-btn.github:hover { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.35); }
+    .soc-btn.apple:hover  { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.3); }
+    .soc-btn svg { width:17px; height:17px; flex-shrink:0; }
+
+    /* OR divider */
+    .or-dv {
+      display:flex; align-items:center; gap:10px; margin-bottom:20px;
+      color:rgba(255,255,255,0.25); font-size:0.74rem; font-weight:500;
+    }
+    .or-dv::before,.or-dv::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
+
+    /* Floating label inputs */
+    .fg { position:relative; margin-bottom:16px; }
+    .fg input {
+      width:100%; padding:16px 44px 6px 44px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:12px; color:#fff;
+      font-size:0.89rem; font-family:'Poppins',sans-serif;
+      outline:none; transition:all 0.3s;
+    }
+    .fg input::placeholder { color:transparent; }
+    .fg label {
+      position:absolute; left:44px; top:50%; transform:translateY(-50%);
+      color:rgba(255,255,255,0.35); font-size:0.87rem; font-weight:500;
+      pointer-events:none; transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .fg input:focus, .fg input:not(:placeholder-shown) {
+      border-color:rgba(8,145,178,0.6);
+      background:rgba(8,145,178,0.07);
+      box-shadow:0 0 0 3px rgba(8,145,178,0.14), 0 4px 14px rgba(0,0,0,0.2);
+      padding-top:20px; padding-bottom:4px;
+    }
+    .fg input:focus + label, .fg input:not(:placeholder-shown) + label {
+      top:10px; transform:none; font-size:0.66rem; letter-spacing:0.5px;
+      color:rgba(8,145,178,0.9); font-weight:600;
+    }
+    .fg .fi { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1rem; color:rgba(255,255,255,0.3); pointer-events:none; }
+    .fg input:focus ~ .fi { color:rgba(8,145,178,0.8); }
+    .eye-b {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.3);
+      font-size:1rem; padding:4px; transition:color 0.25s; line-height:1;
+    }
+    .eye-b:hover { color:rgba(8,145,178,0.9); }
+
+    /* Forgot link */
+    .fg-link {
+      display:block; text-align:right; color:rgba(8,145,178,0.8);
+      font-size:0.77rem; font-weight:600; margin-bottom:20px; margin-top:-8px;
+      cursor:pointer; transition:color 0.2s; text-decoration:none;
+    }
+    .fg-link:hover { color:#06b6d4; text-decoration:underline; }
+
+    /* Submit button */
+    .sub-btn {
+      width:100%; padding:14px; border:none; border-radius:14px;
+      background:linear-gradient(135deg,#0891B2,#06b6d4);
+      color:#fff; font-size:0.94rem; font-weight:700;
+      font-family:'Poppins',sans-serif; cursor:pointer; letter-spacing:0.5px;
+      position:relative; overflow:hidden;
+      box-shadow:0 8px 28px rgba(8,145,178,0.38);
+      transition:all 0.3s ease;
+    }
+    .sub-btn::before {
+      content:''; position:absolute; top:0; left:-100%;
+      width:100%; height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+      transition:left 0.55s;
+    }
+    .sub-btn:hover::before { left:100%; }
+    .sub-btn:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(8,145,178,0.48); }
+    .sub-btn:active { transform:scale(0.97); }
+    .sub-btn:disabled { opacity:0.58; cursor:not-allowed; transform:none; }
+    .spin {
+      display:inline-block; width:14px; height:14px;
+      border:2px solid rgba(255,255,255,0.4); border-top-color:#fff;
+      border-radius:50%; animation:spn 0.7s linear infinite;
+      vertical-align:middle; margin-right:7px;
+    }
+    @keyframes spn { to { transform:rotate(360deg); } }
+
+    /* Forgot Password Modal */
+    .fp-modal {
+      position:fixed; inset:0; z-index:9000;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(5,12,22,0.85); backdrop-filter:blur(12px);
+      opacity:0; pointer-events:none;
+      transition:opacity 0.35s;
+    }
+    .fp-modal.open { opacity:1; pointer-events:all; }
+    .fp-card {
+      width:100%; max-width:400px; padding:46px 40px; text-align:center;
+      background:rgba(12,24,36,0.97); border-radius:28px;
+      border:1px solid rgba(255,255,255,0.09);
+      box-shadow:0 25px 80px rgba(0,0,0,0.6);
+      transform:scale(0.92); transition:transform 0.35s cubic-bezier(0.34,1.3,0.64,1);
+    }
+    .fp-modal.open .fp-card { transform:scale(1); }
+    .fp-icon {
+      width:62px; height:62px; border-radius:18px; margin:0 auto 20px;
+      background:rgba(8,145,178,0.15); border:1px solid rgba(8,145,178,0.3);
+      display:flex; align-items:center; justify-content:center; font-size:1.8rem;
+      animation:ipulse 2s ease-in-out infinite;
+    }
+    @keyframes ipulse { 0%,100%{box-shadow:0 0 0 0 rgba(8,145,178,0.35)} 50%{box-shadow:0 0 0 10px rgba(8,145,178,0)} }
+    .fp-card h2 { font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:10px; }
+    .fp-card p  { font-size:0.83rem; color:rgba(255,255,255,0.45); line-height:1.65; margin-bottom:26px; }
+    .fp-back { background:none; border:none; color:rgba(255,255,255,0.4); font-size:0.82rem; cursor:pointer; margin-top:16px; font-family:'Poppins',sans-serif; transition:color 0.25s; }
+    .fp-back:hover { color:rgba(8,145,178,0.9); }
+
+    /* Sent state */
+    .sent-s { animation:fup 0.5s ease forwards; }
+    .sent-s .si { font-size:3.5rem; display:block; margin-bottom:16px; animation:bIn 0.6s cubic-bezier(0.34,1.7,0.64,1) forwards; }
+    .sent-s h3 { font-size:1.3rem; font-weight:800; color:#fff; margin-bottom:10px; }
+    .sent-s p  { font-size:0.83rem; color:rgba(255,255,255,0.45); line-height:1.65; }
+    @keyframes bIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+    @keyframes fup  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Profile panel */
+    .prof-box {
+      max-width:440px; width:100%; margin:0 auto; padding:46px 40px;
+      background:rgba(12,24,36,0.88); border-radius:28px;
+      border:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 25px 80px rgba(0,0,0,0.5);
+      text-align:center; backdrop-filter:blur(24px);
+      animation:pIn 0.6s cubic-bezier(0.34,1.3,0.64,1) forwards;
+    }
+    @keyframes pIn { from{opacity:0;transform:scale(0.9) translateY(18px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    .pav {
+      width:78px; height:78px; border-radius:50%;
+      background:linear-gradient(135deg,#0891B2,#06b6d4);
+      display:flex; align-items:center; justify-content:center;
+      font-size:2rem; margin:0 auto 18px;
+      box-shadow:0 8px 32px rgba(8,145,178,0.45);
+      animation:avp 3s ease-in-out infinite;
+    }
+    @keyframes avp { 0%,100%{box-shadow:0 8px 32px rgba(8,145,178,0.45)} 50%{box-shadow:0 8px 50px rgba(8,145,178,0.7)} }
+    .pname  { font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:6px; }
+    .pemail { font-size:0.83rem; color:rgba(255,255,255,0.4); margin-bottom:26px; }
+    .pbadge {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:4px 14px; background:rgba(8,145,178,0.15);
+      border:1px solid rgba(8,145,178,0.3); border-radius:20px;
+      color:#06b6d4; font-size:0.74rem; font-weight:600; margin-bottom:28px;
+    }
+    .lo-btn {
+      width:100%; padding:13px; border:1.5px solid rgba(239,68,68,0.4);
+      border-radius:12px; background:rgba(239,68,68,0.08);
+      color:#EF4444; font-size:0.9rem; font-weight:600;
+      font-family:'Poppins',sans-serif; cursor:pointer; transition:all 0.25s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .lo-btn:hover { background:rgba(239,68,68,0.16); border-color:rgba(239,68,68,0.7); transform:translateY(-1px); }
+
+    /* Toast */
+    .a-toast {
+      position:fixed; bottom:28px; right:28px; min-width:280px;
+      padding:16px 20px; border-radius:14px;
+      background:rgba(12,22,36,0.96); backdrop-filter:blur(16px);
+      border:1px solid rgba(255,255,255,0.1);
+      box-shadow:0 10px 40px rgba(0,0,0,0.4);
+      z-index:9999; display:flex; align-items:flex-start; gap:12px;
+      color:#fff; font-size:0.85rem; font-weight:500;
+      transform:translateX(120%); opacity:0;
+      transition:all 0.4s cubic-bezier(0.34,1.4,0.64,1);
+      pointer-events:none;
+    }
+    .a-toast.show { transform:translateX(0); opacity:1; }
+    .a-toast.hide { transform:translateX(120%); opacity:0; transition:all 0.3s ease; }
+    .a-toast.success { border-left:4px solid #10B981; }
+    .a-toast.error   { border-left:4px solid #EF4444; }
+    .a-toast.info    { border-left:4px solid #0891B2; }
+    .ti { font-size:1.2rem; flex-shrink:0; margin-top:1px; }
+    .tb-title { font-weight:700; font-size:0.88rem; margin-bottom:3px; }
+    .tb-msg   { color:rgba(255,255,255,0.55); font-size:0.8rem; line-height:1.4; }
+    .t-bar {
+      position:absolute; bottom:0; left:0; height:3px;
+      border-radius:0 0 14px 14px;
+      animation:tbar 4s linear forwards;
+    }
+    .a-toast.success .t-bar { background:#10B981; }
+    .a-toast.error   .t-bar { background:#EF4444; }
+    .a-toast.info    .t-bar { background:#0891B2; }
+    @keyframes tbar { from{width:100%} to{width:0} }
+
+    @media(max-width:750px) {
+      .glass-box { flex-direction:column; min-height:auto; }
+      .ovl-slide { position:relative; width:100%; height:auto; padding:30px 24px; order:-1; }
+      .glass-box.reg-mode .ovl-slide { transform:none; }
+      .p-login, .p-register { padding:36px 26px; }
+      .glass-box:not(.reg-mode) .p-register { display:none; }
+      .glass-box.reg-mode .p-login { display:none; }
+      .glass-box:not(.reg-mode) .p-register,
+      .glass-box.reg-mode .p-login { opacity:1; pointer-events:all; }
+    }
+  </style>
 </head>
 <body>
-  
+
   <header class="fez-header">
     <a href="index.html" class="fez-brand">
       <div class="fez-logo-icon">🔧</div>
@@ -18,76 +337,181 @@
     </a>
     <nav>
       <ul class="fez-nav-list">
-        <li class="fez-nav-item"><a href="index.html" class="fez-nav-link"><span class="fez-label">Басты</span></a></li>
-        <li class="fez-nav-item"><a href="about.html" class="fez-nav-link"><span class="fez-label">Туралы</span></a></li>
+        <li class="fez-nav-item"><a href="index.html"    class="fez-nav-link"><span class="fez-label">Басты</span></a></li>
+        <li class="fez-nav-item"><a href="about.html"   class="fez-nav-link"><span class="fez-label">Туралы</span></a></li>
         <li class="fez-nav-item"><a href="services.html" class="fez-nav-link"><span class="fez-label">Қызметтер</span></a></li>
-        <li class="fez-nav-item"><a href="blog.html" class="fez-nav-link"><span class="fez-label">Блог</span></a></li>
+        <li class="fez-nav-item"><a href="blog.html"    class="fez-nav-link"><span class="fez-label">Блог</span></a></li>
         <li class="fez-nav-item"><a href="contact.html" class="fez-nav-link"><span class="fez-label">Байланыс</span></a></li>
-        <li class="fez-nav-item"><a href="login.html" class="fez-nav-link fez-cta-link fez-nav-active"><span class="fez-label fez-cta-label">Кіру / Тіркелу</span></a></li>
+        <li class="fez-nav-item"><a href="login.html"   class="fez-nav-link fez-cta-link fez-nav-active"><span class="fez-label fez-cta-label">Кіру / Тіркелу</span></a></li>
       </ul>
     </nav>
   </header>
 
-  <div style="padding-top: 90px; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--background);">
-    <div class="auth-wrapper" style="position:relative;">
-      <div class="auth-container " id="auth-container">
-        
-        <!-- Register Form -->
-        <div class="form-container sign-up-container">
-          <form id="reg-form">
-            <h1>Тіркелу</h1>
-            <span>немесе email арқылы</span>
-            <input type="text" name="name" placeholder="Аты-жөніңіз (кемінде 6 әріп)" required />
-            <input type="email" name="email" placeholder="Email" required />
-            
-            <div class="pass-wrapper" style="width: 100%; position: relative">
-              <input type="password" id="reg-password" name="password" placeholder="Құпиясөз" required />
-            </div>
-            
-            <div class="pass-wrapper" style="width: 100%; position: relative">
-              <input type="password" id="reg-confirm" name="confirmPassword" placeholder="Құпиясөзді қайталаңыз" required />
-            </div>
-            
-            <button type="submit">Тіркелу</button>
-          </form>
-        </div>
+  <!-- Auth Page Background -->
+  <div class="auth-bg">
+    <canvas id="ptcl"></canvas>
 
-        <!-- Login Form -->
-        <div class="form-container sign-in-container">
-          <form id="login-form">
-            <div class="auth-logo">Sheber<span style="color: #F97316">Tab</span></div>
-            <h1>Кіру</h1>
-            <span>немесе аккаунтыңызды қолданыңыз</span>
-            <input type="email" name="email" placeholder="Email" required />
-            
-            <div class="pass-wrapper" style="width: 100%; position: relative">
-              <input type="password" id="login-password" name="password" placeholder="Құпиясөз" required />
-            </div>
-            
-            <a href="#" class="forgot">Құпиясөзді ұмыттыңыз ба?</a>
-            <button type="submit">Кіру</button>
-          </form>
-        </div>
+    <div class="auth-z">
 
-        <!-- Overlay Block for sliding animation -->
-        <div class="overlay-container">
-          <div class="overlay">
-            <div class="overlay-panel overlay-left">
-              <h1>Қайта оралуыңызбен!</h1>
-              <p>Бізбен бірге болу үшін жеке мәліметтеріңізбен кіріңіз</p>
-              <button class="ghost" id="signInBtn">Кіру</button>
-            </div>
-            <div class="overlay-panel overlay-right">
-              <h1>Сәлем, Достым!</h1>
-              <p>Мәліметтеріңізді енгізіп, бізбен бірге маман табыңыз</p>
-              <button class="ghost" id="signUpBtn">Тіркелу</button>
-            </div>
-          </div>
+      <!-- Profile Panel (shown when logged in) -->
+      <div id="prof-panel" style="display:none;">
+        <div class="prof-box">
+          <div class="pav">👤</div>
+          <div class="pname" id="p-name">Пайдаланушы</div>
+          <div class="pemail" id="p-email">email@example.com</div>
+          <div class="pbadge">✅ Аутентификацияланған</div>
+          <button class="lo-btn" id="lo-btn">🚪 Жүйеден шығу</button>
         </div>
       </div>
 
-      <div id="alert-box" class="message-box" style="display:none; position:absolute; bottom:-60px; left:50%; transform:translateX(-50%);"></div>
+      <!-- Auth Container (login + register) -->
+      <div class="glass-box" id="glass-box">
+
+        <!-- LEFT: Login Panel -->
+        <div class="p-login">
+          <div class="pt">Қош келдіңіз</div>
+          <h1 class="ph">Жүйеге кіру</h1>
+          <p class="ps">Аккаунтыңызға кіріп, маман табуды жалғастырыңыз</p>
+
+          <div class="soc-row">
+            <button class="soc-btn google" id="ggl-login" title="Google арқылы кіру">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Google
+            </button>
+            <button class="soc-btn github" id="gh-login" title="GitHub арқылы кіру">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.704-2.782.603-3.369-1.34-3.369-1.34-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+              GitHub
+            </button>
+            <button class="soc-btn apple" id="apl-login" title="Apple арқылы кіру">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.68zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              Apple
+            </button>
+          </div>
+
+          <div class="or-dv">немесе email арқылы</div>
+
+          <form id="login-form">
+            <div class="fg">
+              <input type="email" id="li-email" name="email" placeholder="Email" required>
+              <label for="li-email">Email</label>
+              <span class="fi">✉️</span>
+            </div>
+            <div class="fg">
+              <input type="password" id="li-pw" name="password" placeholder="Құпиясөз" required>
+              <label for="li-pw">Құпиясөз</label>
+              <span class="fi">🔒</span>
+              <button type="button" class="eye-b" data-target="li-pw">👁️</button>
+            </div>
+            <span class="fg-link" id="fp-open-btn">Құпиясөзді ұмыттыңыз ба?</span>
+            <button type="submit" class="sub-btn" id="li-btn">Кіру →</button>
+          </form>
+        </div>
+
+        <!-- RIGHT: Register Panel -->
+        <div class="p-register">
+          <div class="pt">Жаңа аккаунт</div>
+          <h1 class="ph">Тіркелу</h1>
+          <p class="ps">Бізбен бірге болып, кәсіпқой маман табыңыз</p>
+
+          <div class="soc-row">
+            <button class="soc-btn google" data-oauth="google">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Google
+            </button>
+            <button class="soc-btn github" data-oauth="github">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.704-2.782.603-3.369-1.34-3.369-1.34-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+              GitHub
+            </button>
+            <button class="soc-btn apple" data-oauth="apple">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.68zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              Apple
+            </button>
+          </div>
+
+          <div class="or-dv">немесе email арқылы</div>
+
+          <form id="reg-form">
+            <div class="fg">
+              <input type="text" id="ru-name" name="name" placeholder="Аты-жөніңіз" required>
+              <label for="ru-name">Аты-жөніңіз</label>
+              <span class="fi">👤</span>
+            </div>
+            <div class="fg">
+              <input type="email" id="ru-email" name="email" placeholder="Email" required>
+              <label for="ru-email">Email</label>
+              <span class="fi">✉️</span>
+            </div>
+            <div class="fg">
+              <input type="password" id="ru-pw" name="password" placeholder="Құпиясөз" required>
+              <label for="ru-pw">Құпиясөз</label>
+              <span class="fi">🔒</span>
+              <button type="button" class="eye-b" data-target="ru-pw">👁️</button>
+            </div>
+            <div class="fg">
+              <input type="password" id="ru-conf" name="confirmPassword" placeholder="Қайталаңыз" required>
+              <label for="ru-conf">Құпиясөзді қайталаңыз</label>
+              <span class="fi">🔐</span>
+              <button type="button" class="eye-b" data-target="ru-conf">👁️</button>
+            </div>
+            <button type="submit" class="sub-btn" id="ru-btn">Тіркелу →</button>
+          </form>
+        </div>
+
+        <!-- Overlay Slide -->
+        <div class="ovl-slide">
+          <div class="ovl-inner">
+            <div class="ovl-logo">Sheber<span>Tab</span></div>
+            <div id="ovl-login-text">
+              <h2>Сәлем, Достым! 👋</h2>
+              <p>Мәліметтеріңізді енгізіп,<br>бізбен бірге маман табыңыз</p>
+              <button class="ovl-btn" id="go-reg">Тіркелу</button>
+            </div>
+            <div id="ovl-reg-text" style="display:none;">
+              <h2>Қайта оралдыңыз! 🎉</h2>
+              <p>Бізбен бірге болу үшін жеке<br>деректеріңізбен кіріңіз</p>
+              <button class="ovl-btn" id="go-login">Кіру</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- glass-box -->
+    </div><!-- auth-z -->
+  </div><!-- auth-bg -->
+
+  <!-- Forgot Password Modal -->
+  <div class="fp-modal" id="fp-modal">
+    <div class="fp-card">
+      <div id="fp-form-view">
+        <div class="fp-icon">🔑</div>
+        <h2>Құпиясөзді қалпына келтіру</h2>
+        <p>Тіркелген email адресіңізді жазыңыз. Біз сізге парольді қалпына келтіру сілтемесін жібереміз.</p>
+        <form id="fp-form">
+          <div class="fg" style="margin-bottom:20px;">
+            <input type="email" id="fp-email" name="email" placeholder="Email" required>
+            <label for="fp-email">Email адресіңіз</label>
+            <span class="fi">✉️</span>
+          </div>
+          <button type="submit" class="sub-btn" id="fp-btn">📩 Сілтеме жіберу</button>
+        </form>
+        <button class="fp-back" id="fp-close">← Артқа қайту</button>
+      </div>
+      <div id="fp-sent-view" class="sent-s" style="display:none;">
+        <span class="si">📬</span>
+        <h3>Поштаңызды тексеріңіз!</h3>
+        <p>Парольді қалпына келтіру сілтемесі email адресіңізге жіберілді. Inbox немесе Spam папкасын тексеріңіз.</p>
+        <button class="fp-back" id="fp-sent-close" style="margin-top:22px;">← Кіру бетіне оралу</button>
+      </div>
     </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="a-toast" id="a-toast">
+    <span class="ti" id="t-icon">✅</span>
+    <div>
+      <div class="tb-title" id="t-title">Сәтті!</div>
+      <div class="tb-msg"   id="t-msg"></div>
+    </div>
+    <div class="t-bar"></div>
   </div>
 
   <script src="js/auth.js"></script>
