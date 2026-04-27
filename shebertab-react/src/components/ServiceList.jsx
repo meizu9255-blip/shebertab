@@ -1,7 +1,7 @@
 import React from 'react';
 import ServiceCard from './ServiceCard';
 
-function ServiceList({ services, onDelete, onEdit }) {
+function ServiceList({ services, onDelete, onEdit, onOrder }) {
   if (services.length === 0) {
     return (
       <div style={{
@@ -23,7 +23,7 @@ function ServiceList({ services, onDelete, onEdit }) {
   return (
     <div className="services-grid">
       {services.map(s => (
-        <ServiceCard key={s.id} service={s} onDelete={onDelete} onEdit={onEdit} />
+        <ServiceCard key={s.id} service={s} onDelete={onDelete} onEdit={onEdit} onOrder={onOrder} />
       ))}
     </div>
   );

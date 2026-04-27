@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
 // ─── Нұсқаулық: Ортақ JWT жасау функциясы ───
 const generateToken = (user) => {
   return jwt.sign(
-    { id: user.id, email: user.email, name: user.full_name },
+    { id: user.id, email: user.email, name: user.full_name, role: user.role },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
@@ -44,7 +44,7 @@ router.post('/register', async (req, res) => {
 
     // Дерекқорға сақтау
     const newUser = await db.query(
-      'INSERT INTO users (full_name, email, password_hash, provider) VALUES ($1, $2, $3, $4) RETURNING id, full_name, email',
+      'INSERT INTO users (full_name, email, password_hash, provider) VALUES ($1, $2, $3, $4) RETURNING id, full_name, email, role',
       [name, email, password_hash, 'local']
     );
 
@@ -80,7 +80,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = generateToken(user);
-    res.json({ user: { id: user.id, full_name: user.full_name, email: user.email }, token });
+    res.json({ user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role }, token });
   } catch (error) {
     console.error('Кіру қатесі:', error);
     res.status(500).json({ error: 'Сервер қатесі орын алды' });
@@ -180,11 +180,9 @@ router.post('/forgot-password', async (req, res) => {
     }
 
     const user = userRes.rows[0];
-    if (!user.password_hash) {
-      return res.status(400).json({ error: `Бұл аккаунт әлеуметтік желі (${user.provider}) арқылы тіркелген, құпиясөзі жоқ.` });
-    }
 
-    const secret = JWT_SECRET + user.password_hash;
+    // Allowed even for OAuth users so they can set up a local password
+    const secret = JWT_SECRET + (user.password_hash || 'no-password');
     const token = jwt.sign({ id: user.id, email: user.email }, secret, { expiresIn: '15m' });
 
     const resetLink = `${FRONTEND_URL}/reset-password/${user.id}/${token}`;
@@ -220,7 +218,9 @@ router.post('/reset-password/:id/:token', async (req, res) => {
     const { id, token } = req.params;
     const { password } = req.body;
 
-    if (!password) return res.status(400).json({ error: 'Құпиясөз енгізіңіз' });
+    if (!password || password.length < 6) {
+      return res.status(400).json({ error: 'Құпиясөз кемінде 6 таңбадан тұруы керек' });
+    }
 
     const userRes = await db.query('SELECT * FROM users WHERE id = $1', [id]);
     if (userRes.rows.length === 0) {
@@ -228,7 +228,7 @@ router.post('/reset-password/:id/:token', async (req, res) => {
     }
 
     const user = userRes.rows[0];
-    const secret = JWT_SECRET + user.password_hash;
+    const secret = JWT_SECRET + (user.password_hash || 'no-password');
 
     try {
       jwt.verify(token, secret);
@@ -253,8 +253,8 @@ router.post('/reset-password/:id/:token', async (req, res) => {
 // ═════════════════════════════════════════════════════════
 
 // ─── GOOGLE ───
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/login?error=auth_failed` }),
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
+router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/auth?error=auth_failed` }),
   (req, res) => {
     const token = generateToken(req.user);
     // Фронтендке токенмен бірге қайту
@@ -264,7 +264,7 @@ router.get('/google/callback', passport.authenticate('google', { session: false,
 
 // ─── GITHUB ───
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
-router.get('/github/callback', passport.authenticate('github', { session: false, failureRedirect: `${FRONTEND_URL}/login?error=auth_failed` }),
+router.get('/github/callback', passport.authenticate('github', { session: false, failureRedirect: `${FRONTEND_URL}/auth?error=auth_failed` }),
   (req, res) => {
     const token = generateToken(req.user);
     res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
@@ -276,7 +276,7 @@ router.get('/apple', passport.authenticate('apple'));
 router.post('/apple/callback', (req, res, next) => {
     passport.authenticate('apple', { session: false }, (err, user, info) => {
         if (err || !user) {
-            return res.redirect(`${FRONTEND_URL}/login?error=apple_failed`);
+            return res.redirect(`${FRONTEND_URL}/auth?error=apple_failed`);
         }
         const token = generateToken(user);
         res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);

@@ -9,7 +9,9 @@ import Contact from './pages/Contact';
 import Auth from './pages/Auth';
 import AuthCallback from './pages/AuthCallback';
 import Profile from './pages/Profile';
+import Messages from './pages/Messages';
 import ResetPassword from './pages/ResetPassword';
+import AdminPanel from './pages/AdminPanel';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -25,6 +27,8 @@ function App() {
         <Route path="auth/callback" element={<AuthCallback />} />
         <Route path="reset-password/:id/:token" element={<ResetPassword />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="messages" element={<Messages />} />
+        <Route path="admin" element={<AdminPanel />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

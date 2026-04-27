@@ -1,16 +1,7 @@
 import React from 'react';
 import './FilterHeader.css';
 
-const CATEGORIES = [
-  'All',
-  'Сантехник қызметі',
-  'Электрик қызметі',
-  'Жиһаз құрастыру',
-  'Тазалық қызметі',
-  'Күрделі жөндеу',
-];
-
-function FilterHeader({ searchTerm, onSearchChange, filterCategory, onFilterChange }) {
+function FilterHeader({ searchTerm, onSearchChange, filterCategory, onFilterChange, categories = [] }) {
   return (
     <div className="filter-bar">
       
@@ -63,8 +54,9 @@ function FilterHeader({ searchTerm, onSearchChange, filterCategory, onFilterChan
         value={filterCategory}
         onChange={e => onFilterChange(e.target.value)}
       >
-        {CATEGORIES.map(c => (
-          <option key={c} value={c}>{c === 'All' ? 'Барлық қызметтер' : c}</option>
+        <option value="All">Барлық қызметтер</option>
+        {categories.map(c => (
+          <option key={c.id} value={c.title}>{c.title}</option>
         ))}
       </select>
     </div>
@@ -72,3 +64,4 @@ function FilterHeader({ searchTerm, onSearchChange, filterCategory, onFilterChan
 }
 
 export default FilterHeader;
+

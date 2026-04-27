@@ -1,17 +1,90 @@
-import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import API_URL from '../config';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import io from 'socket.io-client';
 import './Navbar.css';
 import DarkToggle from './DarkToggle';
 
 const Navbar = ({ darkMode, onToggleDark }) => {
-  const user = (() => {
-    try {
-      const u = localStorage.getItem('currentUser');
-      return u ? JSON.parse(u) : null;
-    } catch {
-      return null;
+  const [user, setUser] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const socketRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    // Prevent double-connection in React StrictMode
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
     }
-  })();
+
+    fetch(`${API_URL}/api/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.user) { localStorage.removeItem('token'); return; }
+      setUser(data.user);
+
+      // Fetch existing notifications once
+      fetch(`${API_URL}/api/notifications`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(r => r.json())
+      .then(notifs => { if(Array.isArray(notifs)) setNotifications(notifs); });
+
+      // Connect to Socket.io (only once)
+      const socket = io(API_URL, { autoConnect: true });
+      socketRef.current = socket;
+      socket.emit('join', data.user.id);
+
+      // Remove any existing listener before adding to avoid duplicates
+      socket.off('new_notification');
+      socket.on('new_notification', (notif) => {
+        setNotifications(prev => {
+          // Avoid duplicate if notification already exists
+          if (prev.some(n => n.id === notif.id)) return prev;
+          return [notif, ...prev];
+        });
+      });
+    })
+    .catch(() => { localStorage.removeItem('token'); });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off('new_notification');
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, []);
+
+  const markAsRead = async (id) => {
+    const token = localStorage.getItem('token');
+    await fetch(`${API_URL}/api/notifications/${id}/read`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+  };
+
+  const unreadCount = notifications.filter(n => !n.is_read).length;
   const navItems = [
     {
       to: '/',
@@ -19,7 +92,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
       label: 'Басты',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
-          <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/>
+          <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" />
         </svg>
       ),
     },
@@ -28,7 +101,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
       label: 'Туралы',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
-          <path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+          <path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
         </svg>
       ),
     },
@@ -37,7 +110,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
       label: 'Қызметтер',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
-          <path d="m706-136-75-75 51-51-106-106-51 51-75-75 51-51-85-85-51 51-75-75 199-199q14-14 34-14t34 14l75 75 50-51q12-12 28.5-12t28.5 12l93 93q12 12 12 28.5T838-633l-51 50 75 75q14 14 14 34t-14 34L706-136Zm-20-212 56-56-169-169-56 56 169 169ZM314-240q-45 0-82-27t-51-71L80-680l84 84q17 17 17 42t-17 42q-17 17-42 17t-42-17L0-592l83 83q15 15 21 33t6 37l90 90q14 14 14 34t-14 34l-75 75-75-75q-14-14-14-34t14-34l-41-39q-20-20-20-48t20-47l-95-95 152 152q17 17 42 17t42-17q17-17 17-42t-17-42L80-800l192 192q13 13 20.5 29t9.5 34l22 22q0-17 6-33t18-28l159-159q21-21 50-21t50 21l75 75q21 21 21 50t-21 50L763-440q12 14 18 30.5t6 34.5v21l-21-21q-12-12-12-28.5T766-432L634-564q-13-13-31-13t-31 13l-35 35 88 88q17 17 17 41.5T625-357q-17 17-41.5 17T542-357L406-493q-10 10-10 24t10 24l150 150q24 24 26 58t-22 58l-75 75q-14 14-34 14t-34-14l-103-103q-14-14-14-34t14-34l75-75Z"/>
+          <path d="m706-136-75-75 51-51-106-106-51 51-75-75 51-51-85-85-51 51-75-75 199-199q14-14 34-14t34 14l75 75 50-51q12-12 28.5-12t28.5 12l93 93q12 12 12 28.5T838-633l-51 50 75 75q14 14 14 34t-14 34L706-136Zm-20-212 56-56-169-169-56 56 169 169ZM314-240q-45 0-82-27t-51-71L80-680l84 84q17 17 17 42t-17 42q-17 17-42 17t-42-17L0-592l83 83q15 15 21 33t6 37l90 90q14 14 14 34t-14 34l-75 75-75-75q-14-14-14-34t14-34l-41-39q-20-20-20-48t20-47l-95-95 152 152q17 17 42 17t42-17q17-17 17-42t-17-42L80-800l192 192q13 13 20.5 29t9.5 34l22 22q0-17 6-33t18-28l159-159q21-21 50-21t50 21l75 75q21 21 21 50t-21 50L763-440q12 14 18 30.5t6 34.5v21l-21-21q-12-12-12-28.5T766-432L634-564q-13-13-31-13t-31 13l-35 35 88 88q17 17 17 41.5T625-357q-17 17-41.5 17T542-357L406-493q-10 10-10 24t10 24l150 150q24 24 26 58t-22 58l-75 75q-14 14-34 14t-34-14l-103-103q-14-14-14-34t14-34l75-75Z" />
         </svg>
       ),
     },
@@ -46,7 +119,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
       label: 'Блог',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
-          <path d="M160-400v-80h280v80H160Zm0-160v-80h440v80H160Zm0-160v-80h440v80H160Zm360 560v-123l221-221q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T863-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/>
+          <path d="M160-400v-80h280v80H160Zm0-160v-80h440v80H160Zm0-160v-80h440v80H160Zm360 560v-123l221-221q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T863-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
         </svg>
       ),
     },
@@ -55,7 +128,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
       label: 'Байланыс',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
-          <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/>
+          <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z" />
         </svg>
       ),
     },
@@ -64,7 +137,24 @@ const Navbar = ({ darkMode, onToggleDark }) => {
   return (
     <header className="fez-header">
       <Link to="/" className="fez-brand">
-        <div className="fez-logo-icon">🔧</div>
+        <div className="fez-logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40" height="40" fill="none">
+            <defs>
+              <linearGradient id="lg1" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#0891B2"/>
+                <stop offset="100%" stopColor="#0e7490"/>
+              </linearGradient>
+            </defs>
+            {/* Rounded square background */}
+            <rect width="48" height="48" rx="13" fill="url(#lg1)"/>
+            {/* Person head */}
+            <circle cx="24" cy="16" r="5.5" fill="white"/>
+            {/* Person body */}
+            <path d="M14 36c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+            {/* Star top-right */}
+            <path d="M36 10 l1.2 2.4 2.8.4-2 2 .5 2.7L36 16.3l-2.5 1.3.5-2.7-2-2 2.8-.4z" fill="#fbbf24"/>
+          </svg>
+        </div>
         <div className="fez-logo-text">
           <span className="fez-logo-name">Sheber<span>Tab</span></span>
           <span className="fez-logo-sub">Masters Platform</span>
@@ -93,15 +183,139 @@ const Navbar = ({ darkMode, onToggleDark }) => {
             <DarkToggle darkMode={darkMode} onToggle={onToggleDark} />
           </li>
 
+          {/* Admin Panel Link */}
+          {user && user.role === 'admin' && (
+            <li className="fez-nav-item">
+              <Link to="/admin" className="fez-nav-link" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', borderRadius: '8px' }}>
+                <span className="fez-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="22" height="22">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                  </svg>
+                </span>
+                <span className="fez-label">Админ Панель</span>
+              </Link>
+            </li>
+          )}
+
+          {/* Messages / Chat Link */}
+          {user && (
+            <li className="fez-nav-item">
+              <Link to="/messages" className="fez-nav-link">
+                <span className="fez-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
+                    <path d="M240-400h480v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM880-80 720-240H160q-33 0-56.5-23.5T80-320v-480q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v720ZM160-320h594l46 45v-525H160v480Zm0 0v-480 480Z" />
+                  </svg>
+                </span>
+                <span className="fez-label">Чат</span>
+              </Link>
+            </li>
+          )}
+
+          {/* Notifications Dropdown */}
+          {user && (
+            <li className="fez-nav-item" style={{ position: 'relative' }} ref={dropdownRef}>
+              <div 
+                className="fez-nav-link" 
+                onClick={() => setShowDropdown(!showDropdown)} 
+                style={{ cursor: 'pointer' }}
+              >
+                <span className="fez-icon" style={{ position: 'relative' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
+                    <path d="M160-200v-80h80v-280q0-83 50-147.5T420-784v-28q0-25 17.5-42.5T480-872q25 0 42.5 17.5T540-812v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z" />
+                  </svg>
+                  {unreadCount > 0 && (
+                    <span style={{ position: 'absolute', top: '-5px', right: '-10px', background: '#ef4444', color: 'white', borderRadius: '50%', padding: '2px 6px', fontSize: '10px', fontWeight: 'bold', minWidth: '18px', textAlign: 'center' }}>
+                      {unreadCount}
+                    </span>
+                  )}
+                </span>
+                <span className="fez-label">Хабарламалар</span>
+              </div>
+
+              {showDropdown && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 12px)', right: 0,
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '16px',
+                  width: '320px',
+                  maxHeight: '440px',
+                  overflowY: 'auto',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+                  zIndex: 1000,
+                  animation: 'dropdownFadeIn 0.2s ease',
+                  transformOrigin: 'top right'
+                }}>
+                  <style>{`
+                    @keyframes dropdownFadeIn {
+                      from { opacity: 0; transform: scale(0.92) translateY(-8px); }
+                      to   { opacity: 1; transform: scale(1) translateY(0); }
+                    }
+                    .notif-item:hover { background: rgba(8,145,178,0.06) !important; }
+                  `}</style>
+
+                  <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--border)', fontWeight: '700', fontSize: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Хабарламалар</span>
+                    {unreadCount > 0 && <span style={{ fontSize: '12px', background: 'rgba(8,145,178,0.1)', color: '#0891b2', padding: '2px 8px', borderRadius: '20px' }}>{unreadCount} жаңа</span>}
+                  </div>
+
+                  {notifications.length === 0 ? (
+                    <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" width="40" height="40" style={{ margin: '0 auto 8px', display: 'block', opacity: 0.4 }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.143 17.082a24.248 24.248 0 0 0 3.844.148m-3.844-.148a23.856 23.856 0 0 1-5.455-1.31 8.964 8.964 0 0 0 2.3-5.542m3.155 6.852a3 3 0 0 0 5.667 1.97m1.965-2.277L21 21m-4.225-4.225a23.81 23.81 0 0 0 .347-3.051M16.28 16.28 3 3" />
+                      </svg>
+                      <div style={{ fontSize: '13px' }}>Хабарлама жоқ</div>
+                    </div>
+                  ) : (
+                    notifications.map(n => (
+                      <div 
+                        className="notif-item"
+                        key={n.id} 
+                        onClick={() => { 
+                          if(!n.is_read) markAsRead(n.id); 
+                          setShowDropdown(false);
+                          if (n.notification_type === 'chat' && n.sender_id) {
+                            navigate(`/messages?userId=${n.sender_id}&name=${encodeURIComponent(n.title.replace('💬 ', ''))}`);
+                          } else {
+                            navigate('/profile', { state: { tab: 'orders' } });
+                          }
+                        }}
+                        style={{
+                          padding: '14px 18px',
+                          borderBottom: '1px solid var(--border)',
+                          background: n.is_read ? 'transparent' : 'rgba(8, 145, 178, 0.04)',
+                          cursor: 'pointer',
+                          transition: 'background 0.15s',
+                          display: 'flex',
+                          gap: '12px',
+                          alignItems: 'flex-start'
+                        }}
+                      >
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: n.is_read ? 'transparent' : '#0891b2', marginTop: '6px', flexShrink: 0 }} />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: '600', fontSize: '13px', color: n.is_read ? 'var(--text-muted)' : 'var(--text)', marginBottom: '3px' }}>{n.title}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.4' }}>{n.message}</div>
+                          <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '5px' }}>{new Date(n.created_at).toLocaleString()}</div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </li>
+          )}
+
           {/* CTA */}
           <li className="fez-nav-item">
-            <Link to="/auth" className="fez-nav-link fez-cta-link">
+            <Link to={user ? "/profile" : "/auth"} className="fez-nav-link fez-cta-link">
               <span className="fez-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
-                  <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"/>
+                  <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z" />
                 </svg>
               </span>
-              <span className="fez-label fez-cta-label">{user ? `👤 ${user.name}` : 'Кіру / Тіркелу'}</span>
+              <span className="fez-label fez-cta-label">
+                {user ? `👤 ${user.name || user.full_name || 'Профиль'}` : 'Кіру / Тіркелу'}
+              </span>
             </Link>
           </li>
         </ul>

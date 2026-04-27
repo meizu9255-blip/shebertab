@@ -69,14 +69,25 @@ const About = () => {
           </div>
         </div>
 
-        <h2 className="section-title" style={{textAlign:'center'}}>Жасаған</h2>
-        <p className="section-sub" style={{textAlign:'center'}}>Платформаны дамытқан адам</p>
+        <h2 className="section-title" style={{textAlign:'center'}}>Платформа нәтижелері</h2>
+        <p className="section-sub" style={{textAlign:'center'}}>Сандармен айтсақ</p>
 
-        <div className="team-grid fade-up">
-          <div className="team-card">
-            <div className="team-avatar">👨‍💻</div>
-            <h3>Beksultan A.</h3>
-            <p>Full-stack Developer</p>
+        <div className="team-grid fade-up" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '20px' }}>
+          <div className="team-card" style={{ textAlign: 'center', padding: '28px 20px' }}>
+            <div style={{ fontSize: '36px', fontWeight: 800, color: '#0891b2', marginBottom: '6px' }}>500+</div>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>Тексерілген маман</p>
+          </div>
+          <div className="team-card" style={{ textAlign: 'center', padding: '28px 20px' }}>
+            <div style={{ fontSize: '36px', fontWeight: 800, color: '#0891b2', marginBottom: '6px' }}>2 000+</div>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>Орындалған тапсырыс</p>
+          </div>
+          <div className="team-card" style={{ textAlign: 'center', padding: '28px 20px' }}>
+            <div style={{ fontSize: '36px', fontWeight: 800, color: '#0891b2', marginBottom: '6px' }}>4.8 ⭐</div>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>Орташа рейтинг</p>
+          </div>
+          <div className="team-card" style={{ textAlign: 'center', padding: '28px 20px' }}>
+            <div style={{ fontSize: '36px', fontWeight: 800, color: '#0891b2', marginBottom: '6px' }}>15 мин</div>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>Маман табу уақыты</p>
           </div>
         </div>
 
