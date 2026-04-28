@@ -24,6 +24,11 @@ const Navbar = ({ darkMode, onToggleDark }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Render cold-start: ping backend on first load to wake it up
+  useEffect(() => {
+    fetch(`${API_URL}/`).catch(() => {});
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;

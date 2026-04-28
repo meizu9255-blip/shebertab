@@ -137,6 +137,7 @@ const Auth = () => {
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toasts, setToasts] = useState([]);
+  const [serverWaking, setServerWaking] = useState(false);
 
   // Password visibility
   const [showPwLogin, setShowPwLogin] = useState(false);
@@ -159,6 +160,12 @@ const Auth = () => {
           localStorage.removeItem('token');
         });
     }
+
+    // Render cold-start: ping backend to wake it up
+    setServerWaking(true);
+    fetch(`${API_URL}/`)
+      .then(() => setServerWaking(false))
+      .catch(() => setServerWaking(false));
   }, []);
 
   /* ── Toast helper ── */
@@ -306,6 +313,20 @@ const Auth = () => {
     <div className="auth-page-bg">
       <ParticlesBg />
 
+      {/* Render cold-start banner */}
+      {serverWaking && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+          background: 'linear-gradient(90deg, #f59e0b, #f97316)',
+          color: '#fff', textAlign: 'center', padding: '10px 16px',
+          fontSize: '14px', fontWeight: 500, display: 'flex',
+          alignItems: 'center', justifyContent: 'center', gap: '10px'
+        }}>
+          <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⏳</span>
+          Сервер іске қосылуда, 20–30 секунд күтіңіз...
+        </div>
+      )}
+
       <div className="auth-wrapper">
         <div className={`auth-glass-container ${isSignUp ? 'right-active' : ''}`}>
 
@@ -316,12 +337,9 @@ const Auth = () => {
             <p className="panel-sub">Аккаунтыңызға кіріп, маман табуды жалғастырыңыз</p>
 
             {/* Social Buttons */}
-            <div className="social-row">
-              <button className="social-btn-new google" onClick={() => handleOAuth('google')} title="Google арқылы кіру">
-                <GoogleIcon /> Google
-              </button>
-              <button className="social-btn-new github" onClick={() => handleOAuth('github')} title="GitHub арқылы кіру">
-                <GithubIcon /> GitHub
+            <div className="social-row" style={{ justifyContent: 'center' }}>
+              <button className="social-btn-new google" onClick={() => handleOAuth('google')} title="Google арқылы кіру" style={{ width: '100%', maxWidth: '260px' }}>
+                <GoogleIcon /> Google арқылы кіру
               </button>
             </div>
 
@@ -365,12 +383,9 @@ const Auth = () => {
             <h1 className="panel-heading">Тіркелу</h1>
             <p className="panel-sub">Бізбен бірге болып, кәсіпқой маман табыңыз</p>
 
-            <div className="social-row">
-              <button className="social-btn-new google" onClick={() => handleOAuth('google')}>
-                <GoogleIcon /> Google
-              </button>
-              <button className="social-btn-new github" onClick={() => handleOAuth('github')}>
-                <GithubIcon /> GitHub
+            <div className="social-row" style={{ justifyContent: 'center' }}>
+              <button className="social-btn-new google" onClick={() => handleOAuth('google')} style={{ width: '100%', maxWidth: '260px' }}>
+                <GoogleIcon /> Google арқылы тіркелу
               </button>
             </div>
 
