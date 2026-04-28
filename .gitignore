@@ -1,6 +1,9 @@
 # Git ignore
 node_modules/
+.env
 .DS_Store
 Thumbs.db
 *.log
 .vscode/settings.json
+dist/
+build/

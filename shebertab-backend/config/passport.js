@@ -1,7 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
-const AppleStrategy = require('passport-apple');
 const db = require('../db');
 require('dotenv').config();
 
@@ -69,19 +68,4 @@ if (process.env.GITHUB_CLIENT_ID) {
   }));
 }
 
-// ─── APPLE (Apple сәл күрделірек, сондықтан certificate/key талап етеді) ───
-if (process.env.APPLE_CLIENT_ID) {
-  passport.use(new AppleStrategy({
-    clientID: process.env.APPLE_CLIENT_ID,
-    teamID: process.env.APPLE_TEAM_ID,
-    callbackURL: process.env.APPLE_CALLBACK_URL,
-    keyID: process.env.APPLE_KEY_ID,
-    privateKeyLocation: process.env.APPLE_PRIVATE_KEY_PATH,
-  }, function(req, accessToken, refreshToken, idToken, profile, cb) {
-      // Apple profile объектісінде email idToken ішінде болады
-      const jwt = require('jsonwebtoken');
-      let email = idToken ? jwt.decode(idToken).email : `${Date.now()}@apple.com`;
-      let name = 'Apple User';
-      findOrCreateUser({ id: jwt.decode(idToken).sub || Date.now().toString(), displayName: name, emails: [{value: email}] }, 'apple', cb);
-  }));
-}
+
