@@ -3,7 +3,6 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
-const passport = require('passport');
 const nodemailer = require('nodemailer');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_here';
@@ -248,39 +247,5 @@ router.post('/reset-password/:id/:token', async (req, res) => {
   }
 });
 
-// ═════════════════════════════════════════════════════════
-// ─── OAUTH РУТТАРЫ (Google, GitHub, Apple) ───
-// ═════════════════════════════════════════════════════════
-
-// ─── GOOGLE ───
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
-router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/auth?error=auth_failed` }),
-  (req, res) => {
-    const token = generateToken(req.user);
-    // Фронтендке токенмен бірге қайту
-    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
-  }
-);
-
-// ─── GITHUB ───
-router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
-router.get('/github/callback', passport.authenticate('github', { session: false, failureRedirect: `${FRONTEND_URL}/auth?error=auth_failed` }),
-  (req, res) => {
-    const token = generateToken(req.user);
-    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
-  }
-);
-
-// ─── APPLE ───
-router.get('/apple', passport.authenticate('apple'));
-router.post('/apple/callback', (req, res, next) => {
-    passport.authenticate('apple', { session: false }, (err, user, info) => {
-        if (err || !user) {
-            return res.redirect(`${FRONTEND_URL}/auth?error=apple_failed`);
-        }
-        const token = generateToken(user);
-        res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
-    })(req, res, next);
-});
 
 module.exports = router;
