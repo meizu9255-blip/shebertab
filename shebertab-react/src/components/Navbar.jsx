@@ -289,17 +289,9 @@ const Navbar = ({ darkMode, onToggleDark }) => {
           </ul>
         </nav>
 
-        {/* Mobile Top Bar: Dark Toggle + User Button + Hamburger Menu */}
+        {/* Mobile Top Bar: Dark Toggle + Hamburger Menu */}
         <div className="fez-mobile-topbar">
           <DarkToggle darkMode={darkMode} onToggle={onToggleDark} />
-          <Link to={user ? '/profile' : '/auth'} className="fez-mobile-cta">
-            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor">
-              <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 128-46.5T480-440q66 0 132 15.5T740-378q29 15 44.5 43.5T800-272v112H160Z"/>
-            </svg>
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '110px' }}>
-              {user ? (user.name || user.full_name || 'Профиль').split(' ')[0] : 'Кіру'}
-            </span>
-          </Link>
           <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             {isMobileMenuOpen ? (
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
