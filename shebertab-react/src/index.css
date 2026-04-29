@@ -130,7 +130,7 @@ nav a.nav-cta:hover { opacity: 0.9; color: white; }
    PAGE HERO (shared)
 ══════════════════════════════════════════════ */
 .page-hero {
-  padding: 64px 20px 52px;
+  padding: 110px 20px 52px;
   text-align: center;
   background: linear-gradient(160deg, #E6F7FA 0%, var(--bg) 100%);
   border-bottom: 1px solid var(--border);

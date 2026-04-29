@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import API_URL from '../config';
 
 const Contact = () => {
   // Practice 2 connection - Validation
   const [alert, setAlert] = useState({ text: '', type: '' });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const name = e.target.cName.value.trim();
     const email = e.target.cEmail.value.trim();
@@ -15,15 +16,33 @@ const Contact = () => {
       return;
     }
     
-    // basic extra validation
     if (!email.includes('@')) {
       setAlert({ text: '❌ Email дұрыс емес!', type: 'alert error show' });
       return;
     }
 
-    setAlert({ text: '✅ Өтінімдеріңіз қабылданды! Жақында хабарласамыз.', type: 'alert success show' });
-    e.target.reset();
-    setTimeout(() => { setAlert({ text: '', type: 'alert' }); }, 4000);
+    setAlert({ text: '⏳ Жіберілуде...', type: 'alert show' });
+
+    try {
+      const response = await fetch(`${API_URL}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message: msg })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setAlert({ text: '✅ Өтінім қабылданды! Жақында хабарласамыз.', type: 'alert success show' });
+        e.target.reset();
+      } else {
+        setAlert({ text: `❌ Қате: ${data.error}`, type: 'alert error show' });
+      }
+    } catch (err) {
+      setAlert({ text: '❌ Сервермен байланыс жоқ', type: 'alert error show' });
+    }
+
+    setTimeout(() => { setAlert({ text: '', type: 'alert' }); }, 5000);
   };
 
   return (

@@ -54,6 +54,7 @@ app.use('/api/services', servicesRoutes);
 app.use('/api/workers', workersRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contact', require('./routes/contact'));
 
 // Auth middleware for new routes
 const { verifyToken } = require('./middleware/authMiddleware');
