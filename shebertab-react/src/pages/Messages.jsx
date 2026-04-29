@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import API_URL from '../config';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import io from 'socket.io-client';
+import './Messages.css';
 
 const Messages = () => {
   const [contacts, setContacts] = useState([]);
@@ -119,9 +120,9 @@ const Messages = () => {
   };
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 70px)', background: 'var(--bg)' }}>
+    <div className="chat-container">
       {/* Sidebar - Contacts */}
-      <div style={{ width: '300px', background: 'var(--surface)', borderRight: '1px solid var(--border)', overflowY: 'auto' }}>
+      <div className={`chat-sidebar ${selectedUser ? 'hidden' : ''}`}>
         <div style={{ padding: '20px', borderBottom: '1px solid var(--border)', fontWeight: 'bold', fontSize: '18px' }}>
           Чаттар
         </div>
@@ -148,11 +149,15 @@ const Messages = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
+      <div className={`chat-main ${!selectedUser ? 'hidden' : ''}`}>
         {selectedUser ? (
           <>
             {/* Chat Header */}
-            <div style={{ padding: '20px', background: 'var(--surface)', borderBottom: '1px solid var(--border)', fontWeight: 'bold', fontSize: '18px' }}>
+            <div style={{ padding: '20px', background: 'var(--surface)', borderBottom: '1px solid var(--border)', fontWeight: 'bold', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
+              <button className="chat-back-btn" onClick={() => setSelectedUser(null)}>
+                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+                Артқа
+              </button>
               {selectedUser.name}
             </div>
 

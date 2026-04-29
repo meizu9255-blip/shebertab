@@ -133,6 +133,54 @@ const Navbar = ({ darkMode, onToggleDark }) => {
 
   const userName = user ? (user.name || user.full_name || 'Профиль') : 'Кіру / Тіркелу';
 
+  const renderNotifications = (isMobile = false) => (
+    <div style={{
+      position: 'absolute', 
+      ...(isMobile ? { bottom: 'calc(100% + 12px)', right: '10px', width: 'calc(100vw - 20px)' } : { top: 'calc(100% + 12px)', right: 0, width: '320px' }),
+      background: 'var(--surface)', border: '1px solid var(--border)',
+      borderRadius: '16px', maxHeight: '440px',
+      overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+      zIndex: 1000, animation: 'dropdownFadeIn 0.2s ease', transformOrigin: isMobile ? 'bottom right' : 'top right'
+    }} onClick={(e) => e.stopPropagation()}>
+      <style>{`
+        @keyframes dropdownFadeIn {
+          from { opacity: 0; transform: scale(0.92) translateY(isMobile ? 8px : -8px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .notif-item:hover { background: rgba(8,145,178,0.06) !important; }
+      `}</style>
+      <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--border)', fontWeight: '700', fontSize: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span>Хабарламалар</span>
+        {unreadCount > 0 && <span style={{ fontSize: '12px', background: 'rgba(8,145,178,0.1)', color: '#0891b2', padding: '2px 8px', borderRadius: '20px' }}>{unreadCount} жаңа</span>}
+      </div>
+      {notifications.length === 0 ? (
+        <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>Хабарлама жоқ</div>
+      ) : (
+        notifications.map(n => (
+          <div className="notif-item" key={n.id}
+            onClick={() => {
+              if (!n.is_read) markAsRead(n.id);
+              setShowDropdown(false);
+              if (n.notification_type === 'chat' && n.sender_id) {
+                navigate(`/messages?userId=${n.sender_id}&name=${encodeURIComponent(n.title.replace('💬 ', ''))}`);
+              } else {
+                navigate('/profile', { state: { tab: 'orders' } });
+              }
+            }}
+            style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', background: n.is_read ? 'transparent' : 'rgba(8,145,178,0.04)', cursor: 'pointer', transition: 'background 0.15s', display: 'flex', gap: '12px', alignItems: 'flex-start', textAlign: 'left' }}
+          >
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: n.is_read ? 'transparent' : '#0891b2', marginTop: '6px', flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: '600', fontSize: '13px', color: n.is_read ? 'var(--text-muted)' : 'var(--text)', marginBottom: '3px' }}>{n.title}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.4' }}>{n.message}</div>
+              <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '5px' }}>{new Date(n.created_at).toLocaleString()}</div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+
   return (
     <>
       <header className="fez-header">
@@ -221,52 +269,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
                   <span className="fez-label">Хабар</span>
                 </div>
 
-                {showDropdown && (
-                  <div style={{
-                    position: 'absolute', top: 'calc(100% + 12px)', right: 0,
-                    background: 'var(--surface)', border: '1px solid var(--border)',
-                    borderRadius: '16px', width: '320px', maxHeight: '440px',
-                    overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-                    zIndex: 1000, animation: 'dropdownFadeIn 0.2s ease', transformOrigin: 'top right'
-                  }}>
-                    <style>{`
-                      @keyframes dropdownFadeIn {
-                        from { opacity: 0; transform: scale(0.92) translateY(-8px); }
-                        to   { opacity: 1; transform: scale(1) translateY(0); }
-                      }
-                      .notif-item:hover { background: rgba(8,145,178,0.06) !important; }
-                    `}</style>
-                    <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--border)', fontWeight: '700', fontSize: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span>Хабарламалар</span>
-                      {unreadCount > 0 && <span style={{ fontSize: '12px', background: 'rgba(8,145,178,0.1)', color: '#0891b2', padding: '2px 8px', borderRadius: '20px' }}>{unreadCount} жаңа</span>}
-                    </div>
-                    {notifications.length === 0 ? (
-                      <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>Хабарлама жоқ</div>
-                    ) : (
-                      notifications.map(n => (
-                        <div className="notif-item" key={n.id}
-                          onClick={() => {
-                            if (!n.is_read) markAsRead(n.id);
-                            setShowDropdown(false);
-                            if (n.notification_type === 'chat' && n.sender_id) {
-                              navigate(`/messages?userId=${n.sender_id}&name=${encodeURIComponent(n.title.replace('💬 ', ''))}`);
-                            } else {
-                              navigate('/profile', { state: { tab: 'orders' } });
-                            }
-                          }}
-                          style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', background: n.is_read ? 'transparent' : 'rgba(8,145,178,0.04)', cursor: 'pointer', transition: 'background 0.15s', display: 'flex', gap: '12px', alignItems: 'flex-start' }}
-                        >
-                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: n.is_read ? 'transparent' : '#0891b2', marginTop: '6px', flexShrink: 0 }} />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: '600', fontSize: '13px', color: n.is_read ? 'var(--text-muted)' : 'var(--text)', marginBottom: '3px' }}>{n.title}</div>
-                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.4' }}>{n.message}</div>
-                            <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '5px' }}>{new Date(n.created_at).toLocaleString()}</div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
+                {showDropdown && renderNotifications(false)}
               </li>
             )}
 
@@ -356,10 +359,10 @@ const Navbar = ({ darkMode, onToggleDark }) => {
         {user && (
           <button
             className={`fez-bottom-item${showDropdown ? ' active' : ''}`}
-            onClick={() => setShowDropdown(v => !v)}
-            style={{ position: 'relative' }}
+            onClick={(e) => { e.stopPropagation(); setShowDropdown(v => !v); }}
+            style={{ position: 'relative', border: 'none', background: 'transparent', padding: 0 }}
           >
-            <div className="fez-bottom-icon">
+            <div className="fez-bottom-icon" style={{ position: 'relative' }}>
               <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
                 <path d="M160-200v-80h80v-280q0-83 50-147.5T420-784v-28q0-25 17.5-42.5T480-872q25 0 42.5 17.5T540-812v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z"/>
               </svg>
@@ -368,6 +371,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
               )}
             </div>
             <span className="fez-bottom-label">Хабар</span>
+            {showDropdown && renderNotifications(true)}
           </button>
         )}
       </nav>

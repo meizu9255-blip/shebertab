@@ -219,19 +219,21 @@
   .fez-mobile-cta {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     background: linear-gradient(135deg, #0891B2, #F97316);
     color: #fff !important;
     text-decoration: none;
-    padding: 8px 14px;
+    padding: 6px 10px;
     border-radius: 20px;
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     font-weight: 700;
     white-space: nowrap;
     box-shadow: 0 3px 12px rgba(8,145,178,0.35);
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: 100px;
+  }
+
+  .fez-logo-sub {
+    display: none; /* Hide 'Masters Platform' on mobile to save space */
   }
 
   .fez-mobile-cta svg {
