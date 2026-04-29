@@ -47,6 +47,7 @@
   justify-content: center;
   font-size: 1.3rem;
   box-shadow: 0 4px 14px rgba(8, 145, 178, 0.3);
+  flex-shrink: 0;
 }
 
 .fez-logo-text {
@@ -173,7 +174,7 @@
 }
 
 .fez-cta-label {
-  max-width: 140px !important;
+  max-width: 160px !important;
   opacity: 1 !important;
   padding-left: 8px !important;
 }
@@ -189,17 +190,158 @@
   align-items: center;
 }
 
-/* Mobile */
+/* ====================================================
+   MOBILE — Bottom Navigation Bar
+   ==================================================== */
 @media (max-width: 768px) {
+  /* Top navbar — compact: only logo + dark toggle + user btn */
   .fez-header {
-    padding: 0 12px;
-    top: 10px;
-    width: 98%;
+    top: 8px;
+    width: 96%;
+    height: 56px;
+    padding: 0 14px;
+    border-radius: 16px;
   }
-  .fez-logo-name, .fez-logo-sub { display: none; }
-  .fez-label { display: none !important; }
-  .fez-nav-link:hover { min-width: 42px; }
-  .fez-nav-active { min-width: 42px; }
-  .fez-cta-link { min-width: 42px; }
-  .fez-nav-list { gap: 4px; }
+
+  /* Hide the main nav items on mobile — we use bottom bar instead */
+  .fez-nav-list {
+    display: none;
+  }
+
+  /* Mobile top-right: show only dark toggle + user button */
+  .fez-mobile-topbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Mobile user/auth button in top bar */
+  .fez-mobile-cta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #0891B2, #F97316);
+    color: #fff !important;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(8,145,178,0.35);
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fez-mobile-cta svg {
+    flex-shrink: 0;
+  }
+
+  /* ── Bottom Navigation Bar ── */
+  .fez-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1px solid rgba(8, 145, 178, 0.12);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    backdrop-filter: blur(16px);
+    z-index: 9998;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 4px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .dark-theme .fez-bottom-nav {
+    background: rgba(15, 23, 42, 0.96);
+    border-top-color: rgba(34, 211, 238, 0.15);
+  }
+
+  .fez-bottom-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    height: 100%;
+    text-decoration: none;
+    color: #94a3b8;
+    font-size: 0.65rem;
+    font-weight: 600;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.15s;
+    padding: 4px 2px;
+  }
+
+  .fez-bottom-item:active {
+    transform: scale(0.92);
+  }
+
+  .fez-bottom-item.active {
+    color: #0891b2;
+  }
+
+  .dark-theme .fez-bottom-item {
+    color: #64748b;
+  }
+
+  .dark-theme .fez-bottom-item.active {
+    color: #22d3ee;
+  }
+
+  .fez-bottom-icon {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: background 0.2s;
+  }
+
+  .fez-bottom-item.active .fez-bottom-icon {
+    background: rgba(8, 145, 178, 0.12);
+  }
+
+  .fez-bottom-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+  }
+
+  /* Notification badge on bottom nav */
+  .fez-bottom-badge {
+    position: absolute;
+    top: 4px;
+    right: 50%;
+    transform: translateX(calc(50% + 8px));
+    background: #ef4444;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Add bottom padding to page content so it's not hidden behind bottom nav */
+  body {
+    padding-bottom: 72px;
+  }
+}
+
+/* Desktop — hide mobile-only elements */
+@media (min-width: 769px) {
+  .fez-mobile-topbar { display: none; }
+  .fez-bottom-nav { display: none !important; }
 }

@@ -4,6 +4,7 @@
 **Жоба атауы:** SheberTab — Жергілікті маман табу платформасы  
 **Студент:** Әлімбек Бексұлтан  
 **Күні:** 28.04.2026  
+**Тақырып:** №3 — Жергілікті қызмет табу платформасы
 
 ---
 
@@ -12,14 +13,13 @@
 | Параметр | Мәні |
 |----------|------|
 | Жоба атауы | SheberTab |
-| Жоба тақырыбы | Жергілікті қызмет табу платформасы |
-| Сервер | Render.com (Free tier) |
+| Сервер | Render.com |
 | Frontend URL | https://shebertab.onrender.com |
 | Backend URL | https://shebertab-backend.onrender.com |
 | Git репозиторий | https://github.com/meizu9255-blip/shebertab |
-| Мәліметтер базасы | PostgreSQL (Render managed) |
-| Backend Runtime | Node.js |
-| Frontend | React.js (Static Site) |
+| Мәліметтер базасы | PostgreSQL (Render Managed) |
+| Backend Runtime | Node.js (Express.js) |
+| Frontend | React.js (Vite, Static Site) |
 
 ---
 
@@ -27,84 +27,92 @@
 
 | Бөлім | Технология |
 |-------|-----------|
-| Frontend | React.js, Vite, CSS Variables |
+| Frontend | React.js, Vite, CSS Variables, Socket.io-client |
 | Backend | Node.js, Express.js |
 | Дерекқор | PostgreSQL |
-| Аутентификация | JWT (JSON Web Token), Passport.js |
+| Аутентификация | JWT (JSON Web Token), bcrypt |
 | Нақты уақыт | Socket.io (WebSocket) |
-| OAuth | Google OAuth 2.0 |
+| Email | Nodemailer (Gmail SMTP) |
+| Хостинг | Render.com (Free tier) |
 | CI/CD | GitHub → Render Auto-deploy |
-| Хостинг | Render.com |
 
 ---
 
 ## 3. Дайындық кезеңі
 
-### 3.1. Міндетті файлдар тізімі
+### 3.1. Міндетті файлдар
 
-| Файл | Күйі |
-|------|------|
-| `README.md` | ✅ Бар |
-| `.gitignore` | ✅ Бар (`.env`, `node_modules` жасырылған) |
-| `package.json` (backend) | ✅ Бар |
-| `package.json` (frontend) | ✅ Бар |
-| `.env.example` | ✅ Render Environment Variables арқылы |
-| SQL schema файлы | ✅ `shebertab-backend/sql/schema.sql` |
-| `src/config.js` | ✅ `VITE_API_URL` айнымалысы арқылы |
+| Файл | Күйі | Сипаттама |
+|------|------|-----------|
+| `README.md` | ✅ | Жоба туралы толық сипаттама |
+| `.gitignore` | ✅ | `.env`, `node_modules`, `dist` жасырылған |
+| `.env.example` | ✅ | Барлық айнымалылар үлгісі |
+| `package.json` (backend) | ✅ | Node.js тәуелділіктер |
+| `package.json` (frontend) | ✅ | React тәуелділіктер |
+| `sql/schema.sql` | ✅ | Дерекқор схемасы |
+| `src/config.js` | ✅ | Орталықтандырылған API URL |
 
-### 3.2. .gitignore мазмұны
-```
-.env
-node_modules/
-```
+### 3.2. Жоба тазалау кезінде орындалған әрекеттер
 
-### 3.3. src/config.js (орталықтандырылған URL)
+- Пайдаланылмайтын `passport-apple` зависимость алынды
+- Apple OAuth коды алынды
+- Google OAuth, GitHub OAuth батырмалары алынды (тек email auth қалды)
+- `replace_urls.js` уақытша скрипт тазаланды
+- `.env` файл `.gitignore`-ға қосылды
+- Барлық `http://localhost:5000` → `${API_URL}` ауыстырылды
+
+### 3.3. src/config.js
+
 ```javascript
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 export default API_URL;
 ```
-> Барлық `fetch` сұраныстары `http://localhost:5000` орнына осы айнымалыны қолданады. Деплой кезінде Render-дегі URL автоматты орнатылады.
 
 ---
 
-## 4. Сервер баптауы
+## 4. Сервер баптауы — Render.com
 
-### 4.1. Render.com таңдалу себебі
-- Тегін PostgreSQL базасы
-- Node.js автоматты деплой
-- GitHub интеграциясы
-- Environment Variables қолдауы
-- Логтарды нақты уақытта көру
+### 4.1. Render таңдалу себебі
+
+| Критерий | Render |
+|----------|--------|
+| Тегін PostgreSQL | ✅ |
+| Node.js деплой | ✅ |
+| GitHub Auto-deploy | ✅ |
+| Environment Variables | ✅ |
+| Нақты уақыт логтар | ✅ |
+| Сыртқы URL | ✅ |
 
 ### 4.2. Орналастырылған сервистер
 
-**Backend (Web Service):**
+**Backend — Web Service:**
 - Runtime: Node.js
 - Build Command: `npm install`
 - Start Command: `node server.js`
-- Region: Oregon
+- Region: Oregon (US West)
 
-**Frontend (Static Site):**
+**Frontend — Static Site:**
 - Build Command: `npm run build`
 - Publish Directory: `dist`
 - Region: Global (CDN)
 
-**Database (PostgreSQL):**
-- Plan: Free
-- Region: Oregon (Backend-пен бір аймақта)
+**Database — PostgreSQL:**
+- Type: Render Managed PostgreSQL
+- Region: Oregon (Backend-пен бір аймақ)
 
-### 4.3. Environment Variables (Backend)
+### 4.3. Environment Variables
+
+**Backend:**
 
 | KEY | Мақсаты |
 |-----|---------|
-| `DATABASE_URL` | PostgreSQL байланыс сілтемесі |
-| `JWT_SECRET` | Token шифрлау кілті |
-| `FRONTEND_URL` | CORS үшін фронтенд адресі |
-| `GOOGLE_CLIENT_ID` | Google OAuth |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth |
-| `GOOGLE_CALLBACK_URL` | OAuth callback URL |
+| `DATABASE_URL` | Render PostgreSQL байланыс URL |
+| `JWT_SECRET` | Token шифрлау |
+| `FRONTEND_URL` | CORS рұқсаты |
+| `SMTP_USER` | Email жіберу |
+| `SMTP_PASS` | Gmail App Password |
 
-### 4.4. Environment Variables (Frontend)
+**Frontend:**
 
 | KEY | Мәні |
 |-----|------|
@@ -114,195 +122,206 @@ export default API_URL;
 
 ## 5. Мәліметтер базасын серверге көшіру
 
-### 5.1. Дерекқор кестелері
-`db.js` файлы сервер іске қосылғанда автоматты кестелер жасайды:
+### 5.1. Автоматты инициализация
+
+`db.js` файлы сервер іске қосылғанда автоматты:
 
 ```javascript
-// Хабарландырулар кестесі
-CREATE TABLE IF NOT EXISTS notifications (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  title VARCHAR(255),
-  message TEXT,
-  is_read BOOLEAN DEFAULT false,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+// 1. Кестелер жасалады
+CREATE TABLE IF NOT EXISTS users (...);
+CREATE TABLE IF NOT EXISTS services (...);
+CREATE TABLE IF NOT EXISTS workers (...);
+CREATE TABLE IF NOT EXISTS orders (...);
+CREATE TABLE IF NOT EXISTS notifications (...);
+CREATE TABLE IF NOT EXISTS messages (...);
 
-// Хабарламалар кестесі
-CREATE TABLE IF NOT EXISTS messages (
-  id SERIAL PRIMARY KEY,
-  sender_id INTEGER REFERENCES users(id),
-  receiver_id INTEGER REFERENCES users(id),
-  message_text TEXT,
-  is_read BOOLEAN DEFAULT false,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+// 2. Seed деректер қосылады
+// - 4 қызмет категориясы
+// - 6 тесттік маман
+// - 1 Admin аккаунты
 ```
 
-### 5.2. Бастапқы деректер (Seed Data)
-Сервер іске қосылғанда автоматты:
-- 6 тесттік маман пайдаланушы жасалады
-- 4 қызмет категориясы қосылады
-- Админ аккаунты жасалады: `admin@shebertab.kz / admin123`
+### 5.2. Render PostgreSQL-ға pgAdmin арқылы қосылу
 
-### 5.3. База байланысын тексеру
-```
-PostgreSQL дерекқорына сәтті қосылды
-Базаға қызмет түрлері (services) сәтті қосылды!
-Базаға барлық 6 тесттік мамандар (workers) сәтті қосылды!
-Админ аккаунты құрылды: admin@shebertab.kz / admin123
-```
+- **Host:** `dpg-xxxxx.oregon-postgres.render.com` (External)
+- **Port:** `5432`
+- **SSL Mode:** `require`
+- **Database/User:** Render "Connections" бетінен алынды
+
+### 5.3. Нәтиже
+
+Сервердегі базада деректер сәтті тексерілді:
+- `users` кестесінде тіркелген пайдаланушылар бар
+- `services` кестесінде 4 категория бар
+- `workers` кестесінде 6 маман бар
 
 ---
 
-## 6. REST API Endpoint-тер тексеруі
+## 6. Статикалық файлдарды баптау
 
-### 6.1. Аутентификация API
-| Endpoint | Метод | Сипаттама | Күйі |
-|----------|-------|-----------|------|
-| `/api/auth/register` | POST | Тіркелу | ✅ |
-| `/api/auth/login` | POST | Кіру | ✅ |
-| `/api/auth/me` | GET | Ағымдағы пайдаланушы | ✅ |
-| `/api/auth/profile` | PUT | Профиль жаңарту | ✅ |
-| `/api/auth/password` | PUT | Пароль өзгерту | ✅ |
-| `/api/auth/google` | GET | Google OAuth | ✅ |
-| `/api/auth/forgot-password` | POST | Пароль қалпына келтіру | ✅ |
+| Тексеріс | Нәтиже |
+|----------|--------|
+| CSS стильдер | ✅ Жүктеледі |
+| JavaScript файлдары | ✅ Жүктеледі |
+| Иконкалар (SVG) | ✅ Көрінеді |
+| Шрифттер (Google Fonts) | ✅ Жүктеледі |
+| Браузер Console қатесі | ✅ Жоқ |
 
-### 6.2. Мамандар API
-| Endpoint | Метод | Сипаттама | Күйі |
-|----------|-------|-----------|------|
-| `/api/workers` | GET | Барлық мамандар | ✅ |
-| `/api/workers` | POST | Маман тіркеу | ✅ |
-| `/api/workers/:id/rating` | PUT | Рейтинг беру | ✅ |
-| `/api/workers/:id` | DELETE | Маманды жою | ✅ |
-
-### 6.3. Тапсырыстар API
-| Endpoint | Метод | Сипаттама | Күйі |
-|----------|-------|-----------|------|
-| `/api/orders` | POST | Тапсырыс жасау | ✅ |
-| `/api/orders/:userId` | GET | Пайдаланушы тапсырыстары | ✅ |
-| `/api/orders/:id/status` | PUT | Күйін өзгерту | ✅ |
-
-### 6.4. Хабарламалар API
-| Endpoint | Метод | Сипаттама | Күйі |
-|----------|-------|-----------|------|
-| `/api/messages` | POST | Хабарлама жіберу | ✅ |
-| `/api/messages/contacts` | GET | Контактілер тізімі | ✅ |
-| `/api/messages/:userId` | GET | Чат тарихы | ✅ |
-
-### 6.5. Хабарландырулар API (WebSocket)
-| Endpoint | Метод | Сипаттама | Күйі |
-|----------|-------|-----------|------|
-| `/api/notifications` | GET | Барлық хабарландырулар | ✅ |
-| `/api/notifications/:id/read` | PATCH | Оқылды деп белгілеу | ✅ |
-| `socket.on('join')` | WS | Бөлмеге кіру | ✅ |
-| `socket.emit('new_notification')` | WS | Хабарлама жіберу | ✅ |
-
-### 6.6. Админ API
-| Endpoint | Метод | Сипаттама | Күйі |
-|----------|-------|-----------|------|
-| `/api/admin/users` | GET | Пайдаланушылар тізімі | ✅ |
-| `/api/admin/workers` | GET | Мамандар тізімі | ✅ |
-| `/api/admin/users/:id/role` | PUT | Рөл өзгерту | ✅ |
-| `/api/admin/services` | POST | Категория қосу | ✅ |
-| `/api/admin/services/:id` | PUT | Категория өзгерту | ✅ |
-| `/api/admin/services/:id` | DELETE | Категория жою | ✅ |
+React Vite `npm run build` барлық статикалық файлдарды `dist/` папкасына жинайды. Render Static Site `dist/` папкасын CDN арқылы таратады.
 
 ---
 
-## 7. Тексерілген функционалдар (№3 тақырып)
+## 7. REST API Endpoint-тер тексеруі
 
-### 7.1. Клиент және маман ретінде тіркелу
-- Email/пароль арқылы тіркелу — ✅
-- Google OAuth арқылы кіру — ✅
-- JWT токен арқылы сессия — ✅
-- Профиль → Маман профилі бөліміне өтіп маман тіркелу — ✅
+### 7.1. Аутентификация
 
-### 7.2. Маман профилін жасау
-- Профиль бетінен қызмет түрін, бағасын, орындау уақытын толтыру — ✅
-- Серверге POST `/api/workers` арқылы жіберу — ✅
+| Endpoint | Метод | Status | Нәтиже |
+|----------|-------|--------|--------|
+| `/api/auth/register` | POST | 201 | ✅ |
+| `/api/auth/login` | POST | 200 | ✅ |
+| `/api/auth/me` | GET | 200/401 | ✅ |
+| `/api/auth/profile` | PUT | 200 | ✅ |
+| `/api/auth/forgot-password` | POST | 200 | ✅ |
+| `/api/auth/reset-password/:id/:token` | POST | 200 | ✅ |
 
-### 7.3. Қызмет түрі бойынша іздеу және фильтр
-- Мамандар бетінде іздеу жолағы — ✅
-- Категория бойынша фильтр — ✅
-- Фильтр динамикалық, бетті жаңартпай жұмыс істейді — ✅
+### 7.2. Мамандар
 
-### 7.4. Рейтинг және пікір қалдыру
-- Аяқталған тапсырыстан кейін жұлдызша рейтинг беру — ✅
-- `is_rated` өрісі қайталап бағалауды болдырмайды — ✅
+| Endpoint | Метод | Status | Нәтиже |
+|----------|-------|--------|--------|
+| `/api/workers` | GET | 200 | ✅ |
+| `/api/workers` | POST | 201 | ✅ |
+| `/api/workers/:id/rating` | PUT | 200 | ✅ |
+| `/api/workers/:id` | DELETE | 200 | ✅ |
 
-### 7.5. Клиенттің өтінім жіберуі
-- Маман профилінен тапсырыс беру — ✅
-- Тапсырыс «Менің тапсырыстарым» бетінде көрінеді — ✅
+### 7.3. Тапсырыстар
 
-### 7.6. Маманға notification (хабарландыру) келуі
-- Жаңа тапсырыс келгенде маманға Socket.io арқылы нақты уақытта хабарландыру — ✅
-- Navbar-да оқылмаған хабарландыру санашығы — ✅
+| Endpoint | Метод | Status | Нәтиже |
+|----------|-------|--------|--------|
+| `/api/orders` | POST | 201 | ✅ |
+| `/api/orders/:userId` | GET | 200 | ✅ |
+| `/api/orders/:id/status` | PUT | 200 | ✅ |
 
-### 7.7. Админнің қызмет категорияларын басқаруы
-- Категория қосу, өзгерту, жою — ✅
-- Рөлге негізделген қолжетімділік (тек admin) — ✅
+### 7.4. Хабарламалар (Chat)
+
+| Endpoint | Метод | Status | Нәтиже |
+|----------|-------|--------|--------|
+| `/api/messages` | POST | 201 | ✅ |
+| `/api/messages/contacts` | GET | 200 | ✅ |
+| `/api/messages/:userId` | GET | 200 | ✅ |
+
+### 7.5. Хабарландырулар (Socket.io)
+
+| Endpoint/Event | Нәтиже |
+|----------------|--------|
+| `GET /api/notifications` | ✅ |
+| `PATCH /api/notifications/:id/read` | ✅ |
+| `socket.on('join')` | ✅ |
+| `socket.emit('new_notification')` | ✅ |
+
+### 7.6. Админ панель
+
+| Endpoint | Метод | Status | Нәтиже |
+|----------|-------|--------|--------|
+| `/api/admin/users` | GET | 200 | ✅ |
+| `/api/admin/workers` | GET | 200 | ✅ |
+| `/api/admin/users/:id/role` | PUT | 200 | ✅ |
+| `/api/admin/users/:id` | DELETE | 200 | ✅ |
+| `/api/admin/services` | POST | 201 | ✅ |
+| `/api/admin/services/:id` | PUT | 200 | ✅ |
+| `/api/admin/services/:id` | DELETE | 200 | ✅ |
 
 ---
 
-## 8. Қауіпсіздік конфигурациясы
+## 8. №3 Тақырып бойынша функционалдар тексеруі
+
+| Функционал | Тексеріс | Нәтиже |
+|-----------|----------|--------|
+| Email арқылы тіркелу | Жаңа email, пароль енгізіп тіркелу | ✅ |
+| Email арқылы кіру | Тіркелген email/пароль | ✅ |
+| Профиль редактирлеу | Аты-жөні, телефон өзгерту | ✅ |
+| Маман профилін жасау | Профиль → маман тіркеу формасы | ✅ |
+| Қызмет категориясы бойынша іздеу | Фильтр dropdown | ✅ |
+| Аты бойынша іздеу | Search input | ✅ |
+| Тапсырыс беру | Маман картасынан тапсырыс | ✅ |
+| Тапсырыс күйін өзгерту | accepted/completed/rejected | ✅ |
+| Рейтинг беру | Аяқталған тапсырыстан жұлдыз | ✅ |
+| Нақты уақыт хабарландыру | Socket.io push notification | ✅ |
+| Чат жіберу | Messages беті | ✅ |
+| Рөлге негізделген қол жетімділік | Admin тек admin көреді | ✅ |
+| Категория қосу (Admin) | AdminPanel → + батырмасы | ✅ |
+| Категория өзгерту (Admin) | ✏️ батырмасы | ✅ |
+| Категория жою (Admin) | 🗑️ батырмасы | ✅ |
+| Пайдаланушы рөлін өзгерту (Admin) | Dropdown | ✅ |
+| Пароль қалпына келтіру | Email арқылы сілтеме | ✅ |
+| Мобильді экранда ашылу | 375px экранда | ✅ |
+
+---
+
+## 9. Қауіпсіздік конфигурациясы
 
 | Талап | Іске асырылуы |
 |-------|--------------|
-| Құпия кілттер репозиторийде жоқ | ✅ `.env` gitignore-да |
-| JWT арқылы аутентификация | ✅ `verifyToken` middleware |
-| CORS баптауы | ✅ тек `FRONTEND_URL`-ге рұқсат |
-| Пароль хэштелген | ✅ bcrypt (10 rounds) |
-| Рөлге негізделген қолжетімділік | ✅ admin/worker/client рөлдері |
-| Басқа пайдаланушы деректерін өзгертуге тыйым | ✅ token-дан id тексеріледі |
+| `.env` gitignore-да | ✅ |
+| JWT аутентификация | ✅ `verifyToken` middleware |
+| bcrypt пароль хэштеу | ✅ 10 rounds |
+| CORS тек рұқсат берілген домен | ✅ `FRONTEND_URL` env |
+| Рөлге негізделген қолжетімділік | ✅ admin/worker/client |
+| Basқа пайдаланушы деректерін өзгертуге тыйым | ✅ token-дан id тексеріледі |
+| Debug режимі өшірілген | ✅ Render production mode |
 
 ---
 
-## 9. Қате журналы
+## 10. Қате журналы
 
 | № | Қате сипаттамасы | Себебі | Шешімі | Күйі |
 |---|-----------------|--------|--------|------|
-| 1 | `git push` блокталды | `.env` файлы GitHub-қа жүктелді | `git rm --cached .env`, `.gitignore` жаңартылды | ✅ Түзетілді |
-| 2 | Internal Server Error | `DATABASE_URL` env жоқ | Render-ге `DATABASE_URL` қосылды | ✅ Түзетілді |
-| 3 | CORS қатесі | `FRONTEND_URL` дұрыс орнатылмаған | Backend env-ке Render frontend URL қосылды | ✅ Түзетілді |
-| 4 | API `localhost:5000` деп тұрды | Hardcoded URL | `config.js` арқылы `VITE_API_URL` айнымалысы | ✅ Түзетілді |
-| 5 | Socket.io қосылмады | Hardcoded socket URL | `io(API_URL)` — config-тен оқылатын болды | ✅ Түзетілді |
+| 1 | `git push` блокталды | `.env` файлы секреттермен GitHub-қа жүктелді | `git rm --cached .env`, `.gitignore` жаңартылды, `git push --force` | ✅ Түзетілді |
+| 2 | `500 Internal Server Error` (login) | Render базасында кестелер жоқ болды | `db.js` жаңартылды: `CREATE TABLE IF NOT EXISTS` алдымен орындалады | ✅ Түзетілді |
+| 3 | CORS қатесі | `FRONTEND_URL` env орнатылмаған | Render backend-ке `FRONTEND_URL` қосылды | ✅ Түзетілді |
+| 4 | Барлық fetch `localhost:5000` деп тұрды | Hardcoded URL | `config.js` арқылы `VITE_API_URL` айнымалысы енгізілді | ✅ Түзетілді |
+| 5 | pgAdmin External байланыс қатесі | Internal hostname қолданылды | External hostname (`.oregon-postgres.render.com`) + SSL `require` | ✅ Түзетілді |
+| 6 | Google OAuth жұмыс істемеді | Render callback URL Google Console-да тіркелмеген | Google OAuth толық алынды, тек email/пароль қалды | ✅ Түзетілді |
 
 ---
 
-## 10. Тестілеу нәтижесі
+## 11. Тестілеу нәтижесі
 
 | Тест | Нәтиже |
 |------|--------|
-| Тіркелу (email) | ✅ Өтті |
+| Тіркелу (email/пароль) | ✅ Өтті |
 | Кіру (email/пароль) | ✅ Өтті |
-| Google OAuth | ✅ Өтті |
+| Жаңа пайдаланушы базада сақталуы | ✅ pgAdmin арқылы тексерілді |
 | Маман тізімін көру | ✅ Өтті |
+| Категория бойынша фильтрлеу | ✅ Өтті |
 | Тапсырыс беру | ✅ Өтті |
 | Тапсырыс күйін өзгерту | ✅ Өтті |
 | Рейтинг беру | ✅ Өтті |
 | Хабарлама жіберу (чат) | ✅ Өтті |
 | Нақты уақыт хабарландыру | ✅ Өтті |
-| Админ панель (CRUD) | ✅ Өтті |
-| Категория басқару | ✅ Өтті |
-| Мобильді экранда ашылу | ✅ Өтті |
-| Рөлге негізделген қолжетімділік | ✅ Өтті |
+| Adminpanel — категория CRUD | ✅ Өтті |
+| AdminPanel — пайдаланушы рөлі | ✅ Өтті |
+| Пароль қалпына келтіру (email) | ✅ Өтті |
 | CSS/статикалық файлдар | ✅ Өтті |
+| Мобильді экранда ашылу | ✅ Өтті |
+| Авторизациясыз қорғалған бет | ✅ 401 қайтарады |
 
 ---
 
-## 11. Қорытынды
+## 12. Қорытынды
 
-SheberTab жобасы Render.com платформасына сәтті орналастырылды. Жоба толықтай жұмыс режимінде:
-- **Frontend** `https://shebertab.onrender.com` адресінде Static Site ретінде жұмыс істейді
+**SheberTab** жергілікті маман табу платформасы Render.com сервисіне сәтті орналастырылды. Жоба толық жұмыс режимінде:
+
+- **Frontend** `https://shebertab.onrender.com` адресінде Static Site ретінде CDN арқылы жұмыс істейді
 - **Backend** `https://shebertab-backend.onrender.com` адресінде Node.js Web Service ретінде жұмыс істейді
-- **PostgreSQL** базасы Render-де орналасқан және автоматты инициализацияланады
-- **Socket.io** WebSocket байланысы нақты уақыт хабарландырулары мен чат үшін жұмыс істейді
+- **PostgreSQL** базасы Render-де орналасқан, автоматты инициализацияланады
+- **Socket.io** WebSocket нақты уақыт хабарландырулары жұмыс істейді
 - Барлық **REST API** endpoint-тері JSON форматында дұрыс жауап береді
-- **Қауіпсіздік** талаптары сақталған: JWT, bcrypt, CORS, рөлдік жүйе
-
-Деплой барысында 5 қате анықталды және барлығы сәтті түзетілді.
+- **JWT + bcrypt** қауіпсіздік жүйесі іске асырылған
+- **Рөлдік жүйе** (admin / worker / client) жұмыс істейді
+- Деплой барысында **6 қате** анықталды және барлығы сәтті түзетілді
 
 ---
+
 **Жоба сілтемесі:** https://shebertab.onrender.com  
+**Backend API:** https://shebertab-backend.onrender.com  
 **GitHub:** https://github.com/meizu9255-blip/shebertab
