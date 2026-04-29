@@ -65,6 +65,10 @@ app.get('/', (req, res) => {
   res.send('SheberTab Backend жұмыс істеп тұр!');
 });
 
-server.listen(PORT, () => {
-  console.log(`Сервер http://localhost:${PORT} адресінде іске қосылды`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`Сервер http://localhost:${PORT} адресінде іске қосылды`);
+  });
+}
+
+module.exports = { app, server };

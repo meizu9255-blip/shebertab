@@ -1,0 +1,40 @@
+services:
+  # 1. PostgreSQL Дерекқоры
+  - type: pgo
+    name: shebertab-db
+    databaseName: shebertab
+    user: admin
+    plan: free
+
+  # 2. Backend (Node.js API)
+  - type: web
+    name: shebertab-backend
+    env: node
+    plan: free
+    rootDir: shebertab-backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shebertab-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://shebertab-app.onrender.com # Фронтенд URL-і
+
+  # 3. Frontend (React/Vite Static Site)
+  - type: web
+    name: shebertab-app
+    env: static
+    plan: free
+    rootDir: shebertab-react
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: shebertab-backend
+          property: url

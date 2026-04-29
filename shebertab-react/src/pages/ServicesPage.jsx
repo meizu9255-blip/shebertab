@@ -165,7 +165,7 @@ const ServicesPage = () => {
     <>
       {/* Page hero */}
       <section className="page-hero">
-        <div className="badge">⚙️ CRUD жүйесі (React)</div>
+        <div className="badge">⚙️ Мамандар </div>
         <h1>Маман <span className="grad">тізімі</span></h1>
         <p>Платформадағы шеберлерді іздеңіз, қосыңыз, өңдеңіз немесе өшіріңіз</p>
       </section>
