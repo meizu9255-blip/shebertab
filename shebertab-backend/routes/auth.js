@@ -3,19 +3,34 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
-const nodemailer = require('nodemailer');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_here';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
-// ─── Nodemailer Transporter ───
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+// ─── Resend API арқылы email жіберу ───
+const sendEmail = async ({ to, subject, html }) => {
+  if (!RESEND_API_KEY) {
+    console.warn('⚠️  RESEND_API_KEY орнатылмаған — email жіберілмеді');
+    return;
   }
-});
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: 'SheberTab <onboarding@resend.dev>',
+      to,
+      subject,
+      html
+    })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(JSON.stringify(data));
+  return data;
+};
 
 // ─── Нұсқаулық: Ортақ JWT жасау функциясы ───
 const generateToken = (user) => {
@@ -167,7 +182,7 @@ router.put('/password', async (req, res) => {
 });
 
 
-// ─── 6. FORGOT PASSWORD (Құпиясөзді ұмытқанда хат жіберу) ───
+// ─── 6. FORGOT PASSWORD ───
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
@@ -179,35 +194,39 @@ router.post('/forgot-password', async (req, res) => {
     }
 
     const user = userRes.rows[0];
-
-    // Allowed even for OAuth users so they can set up a local password
     const secret = JWT_SECRET + (user.password_hash || 'no-password');
     const token = jwt.sign({ id: user.id, email: user.email }, secret, { expiresIn: '15m' });
-
     const resetLink = `${FRONTEND_URL}/reset-password/${user.id}/${token}`;
 
-    const mailOptions = {
-      from: `"SheberTab" <${process.env.SMTP_USER}>`,
+    await sendEmail({
       to: user.email,
       subject: 'SheberTab: Құпиясөзді қалпына келтіру',
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; border-radius: 10px;">
-          <h2 style="color: #0891B2;">Құпиясөзді өзгерту</h2>
-          <p>Сәлеметсіз бе, <b>${user.full_name}</b>!</p>
-          <p>Сіз немесе біреу SheberTab аккаунтыңыздың құпиясөзін өзгертуге сұраныс жіберді.</p>
-          <p>Егер бұл сіз болсаңыз, төмендегі батырманы басып жаңа құпиясөз орнатыңыз (сілтеме тек 15 минут жарамды):</p>
-          <a href="${resetLink}" style="display: inline-block; padding: 12px 24px; background-color: #0891B2; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 10px 0;">Құпиясөзді ауыстыру</a>
-          <p style="margin-top: 20px; font-size: 12px; color: #777;">Егер бұл сұранысты сіз жасамасаңыз, бұл хатты елемеңіз.</p>
+        <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#f8fafc;border-radius:16px">
+          <div style="text-align:center;margin-bottom:24px">
+            <div style="width:56px;height:56px;background:linear-gradient(135deg,#0891B2,#06b6d4);border-radius:14px;display:inline-flex;align-items:center;justify-content:center">
+              <span style="font-size:28px">🔑</span>
+            </div>
+          </div>
+          <h2 style="color:#0f172a;font-size:22px;font-weight:800;text-align:center;margin-bottom:8px">Құпиясөзді қалпына келтіру</h2>
+          <p style="color:#475569;font-size:14px;text-align:center;margin-bottom:28px">Сәлеметсіз бе, <strong>${user.full_name}</strong>!<br/>Төмендегі батырманы басыңыз — сілтеме 15 минут жарамды.</p>
+          <div style="text-align:center;margin-bottom:28px">
+            <a href="${resetLink}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#0891B2,#06b6d4);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:15px;box-shadow:0 4px 16px rgba(8,145,178,0.35)">
+              🔓 Құпиясөзді ауыстыру
+            </a>
+          </div>
+          <p style="color:#94a3b8;font-size:12px;text-align:center">Егер бұл сұранысты сіз жасамасаңыз, бұл хатты елемеңіз.</p>
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">
+          <p style="color:#94a3b8;font-size:11px;text-align:center">&copy; 2026 SheberTab</p>
         </div>
       `
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
     res.json({ success: true, message: 'Құпиясөзді қалпына келтіру сілтемесі поштаңызға жіберілді!' });
 
   } catch (error) {
     console.error('Forgot Password қатесі:', error);
-    res.status(500).json({ error: 'Сілтеме жіберу мүмкін болмады (SMTP баптауларын тексеріңіз)' });
+    res.status(500).json({ error: 'Сілтеме жіберу мүмкін болмады. Resend API кілтін тексеріңіз.' });
   }
 });
 
