@@ -77,8 +77,9 @@ function ParticlesBg() {
    Toast Notification
 ═══════════════════════════════════════ */
 function Toast({ toasts }) {
+  if (toasts.length === 0) return null;
   return (
-    <>
+    <div className="auth-toasts">
       {toasts.map(t => (
         <div key={t.id} className={`auth-toast ${t.type} ${t.hiding ? 'hiding' : 'show'}`}>
           <span className="toast-icon">
@@ -91,7 +92,7 @@ function Toast({ toasts }) {
           <div className="toast-bar" />
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
