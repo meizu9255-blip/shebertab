@@ -9,6 +9,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const socketRef = useRef(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -285,7 +286,7 @@ const Navbar = ({ darkMode, onToggleDark }) => {
           </ul>
         </nav>
 
-        {/* Mobile Top Bar: Dark Toggle + User Button */}
+        {/* Mobile Top Bar: Dark Toggle + User Button + Hamburger Menu */}
         <div className="fez-mobile-topbar">
           <DarkToggle darkMode={darkMode} onToggle={onToggleDark} />
           <Link to={user ? '/profile' : '/auth'} className="fez-mobile-cta">
@@ -296,8 +297,41 @@ const Navbar = ({ darkMode, onToggleDark }) => {
               {user ? (user.name || user.full_name || 'Профиль').split(' ')[0] : 'Кіру'}
             </span>
           </Link>
+          <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+            )}
+          </button>
         </div>
       </header>
+
+      {/* ── Mobile Fullscreen Menu ── */}
+      <div className={`mobile-fullscreen-menu ${isMobileMenuOpen ? 'open' : ''}`}>
+        <div className="mobile-menu-content">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) => `mobile-menu-link${isActive ? ' active' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <span className="mobile-menu-icon">{item.icon}</span>
+              <span className="mobile-menu-label">{item.label}</span>
+            </NavLink>
+          ))}
+          {user && user.role === 'admin' && (
+            <NavLink to="/admin" className="mobile-menu-link admin-link" onClick={() => setIsMobileMenuOpen(false)}>
+              <span className="mobile-menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+              </span>
+              <span className="mobile-menu-label">Админ Панель</span>
+            </NavLink>
+          )}
+        </div>
+      </div>
 
       {/* ── Mobile Bottom Navigation Bar ── */}
       <nav className="fez-bottom-nav">

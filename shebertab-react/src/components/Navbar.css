@@ -340,8 +340,108 @@
   }
 }
 
+/* Mobile Hamburger Menu Styles */
+.mobile-menu-btn {
+  background: rgba(8, 145, 178, 0.1);
+  border: none;
+  color: #0891b2;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-menu-btn:active {
+  transform: scale(0.9);
+}
+
+.dark-theme .mobile-menu-btn {
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+}
+
+.mobile-fullscreen-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.98);
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 24px 24px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-20px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(20px);
+}
+
+.mobile-fullscreen-menu.open {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+.dark-theme .mobile-fullscreen-menu {
+  background: rgba(15, 23, 42, 0.98);
+}
+
+.mobile-menu-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(8, 145, 178, 0.04);
+  border-radius: 16px;
+  text-decoration: none;
+  color: #334155;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.dark-theme .mobile-menu-link {
+  background: rgba(255, 255, 255, 0.03);
+  color: #f8fafc;
+}
+
+.mobile-menu-link:active {
+  transform: scale(0.98);
+}
+
+.mobile-menu-link.active {
+  background: linear-gradient(135deg, #0891B2, #06b6d4);
+  color: white;
+  box-shadow: 0 4px 16px rgba(8, 145, 178, 0.3);
+}
+
+.mobile-menu-link.admin-link {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  margin-top: 10px;
+}
+
+.mobile-menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Desktop — hide mobile-only elements */
 @media (min-width: 769px) {
   .fez-mobile-topbar { display: none; }
   .fez-bottom-nav { display: none !important; }
+  .mobile-fullscreen-menu { display: none !important; }
 }
