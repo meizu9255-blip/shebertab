@@ -364,33 +364,33 @@ const AdminPanel = () => {
         )}
 
         {activeTab === 'services' && (
-          <div style={{ padding: '20px' }}>
-            <div style={{ marginBottom: '30px', background: 'var(--surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-              <h3 style={{ marginBottom: '15px' }}>{editingService ? 'Қызметті өңдеу' : 'Жаңа қызмет түрін қосу'}</h3>
-              <form onSubmit={editingService ? handleEditService : handleAddService} style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1 }}>
+          <div className="admin-services-tab">
+            <div className="admin-service-form-card">
+              <h3>{editingService ? 'Қызметті өңдеу' : 'Жаңа қызмет түрін қосу'}</h3>
+              <form onSubmit={editingService ? handleEditService : handleAddService} className="admin-service-form">
+                <div className="admin-service-inputs">
                   <input 
                     type="text" 
                     placeholder="Атауы (мысалы: Электрик)" 
                     value={editingService ? editingService.title : newServiceTitle}
                     onChange={(e) => editingService ? setEditingService({...editingService, title: e.target.value}) : setNewServiceTitle(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', marginBottom: '10px' }}
+                    className="admin-input"
                   />
                   <input 
                     type="text" 
                     placeholder="Сипаттамасы (Description)" 
                     value={editingService ? editingService.description : newServiceDesc}
                     onChange={(e) => editingService ? setEditingService({...editingService, description: e.target.value}) : setNewServiceDesc(e.target.value)}
-                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)' }}
+                    className="admin-input"
                   />
                 </div>
-                <div>
-                  <button type="submit" style={{ padding: '10px 20px', background: 'var(--accent)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>
+                <div className="admin-service-actions">
+                  <button type="submit" className="admin-btn-primary">
                     {editingService ? 'Сақтау' : 'Қосу'}
                   </button>
                   {editingService && (
-                    <button type="button" onClick={() => setEditingService(null)} style={{ padding: '10px 20px', background: 'transparent', color: 'var(--text-muted)', border: 'none', cursor: 'pointer', marginLeft: '10px' }}>
+                    <button type="button" onClick={() => setEditingService(null)} className="admin-btn-cancel">
                       Болдырмау
                     </button>
                   )}
@@ -398,33 +398,35 @@ const AdminPanel = () => {
               </form>
             </div>
 
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Атауы</th>
-                  <th>Сипаттамасы</th>
-                  <th>Әрекеттер</th>
-                </tr>
-              </thead>
-              <tbody>
-                {services.map(s => (
-                  <tr key={s.id}>
-                    <td>{s.id}</td>
-                    <td><strong>{s.title}</strong></td>
-                    <td>{s.description || '-'}</td>
-                    <td>
-                      <button onClick={() => setEditingService(s)} style={{ background: '#0ea5e9', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', marginRight: '10px' }}>
-                        Өңдеу
-                      </button>
-                      <button onClick={() => handleDeleteService(s.id)} className="admin-btn-delete">
-                        Өшіру
-                      </button>
-                    </td>
+            <div className="admin-table-responsive">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Атауы</th>
+                    <th>Сипаттамасы</th>
+                    <th>Әрекеттер</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {services.map(s => (
+                    <tr key={s.id}>
+                      <td>{s.id}</td>
+                      <td><strong>{s.title}</strong></td>
+                      <td>{s.description || '-'}</td>
+                      <td>
+                        <button onClick={() => setEditingService(s)} className="admin-btn-edit">
+                          Өңдеу
+                        </button>
+                        <button onClick={() => handleDeleteService(s.id)} className="admin-btn-delete">
+                          Өшіру
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
